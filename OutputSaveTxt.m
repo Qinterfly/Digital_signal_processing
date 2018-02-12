@@ -1,4 +1,4 @@
-function OutputSave(OutputSignal,FileName,TechnicalData,Path,InputFileName)
+function OutputSaveTxt(OutputSignal, FileName, TechnicalData, Path, InputFileName)
 %Сохранение выходных файлов, датированных днём записи исходного сигнала
 
 Path = strcat(Path,'\Результаты\',InputFileName);
