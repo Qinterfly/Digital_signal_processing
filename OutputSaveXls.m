@@ -1,5 +1,5 @@
 function OutputSaveXls(OutputSignal, TitleLevels, FileName, TechnicalData, Path, InputFileName)
-%Сохранение выходных файлов, датированных днём записи исходного сигнала
+%Сохранение результатов спектрального расчёта в виде таблиц в .xls формате
 
 %Запись пути сохранения
 Path = strcat(Path,'\Результаты\',InputFileName);
