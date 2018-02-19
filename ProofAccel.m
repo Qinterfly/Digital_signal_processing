@@ -24,7 +24,8 @@ function Result = ProofAccel(FileNameDisplacement,... %Имя файла c перемещениями
 %   Изменения:   
 %   - Добавлена возможность сохранения сводных таблиц в формате .xls
 %   - Добавлено сравнение сигналов
-%  Дата: 16.02.2017
+%   - Добавлено поуровневое выделение монотонных склеек
+%  Дата: 19.02.2017
 
 %% +========================= Служебный блок =============================+
 
@@ -33,18 +34,18 @@ if TestMode %Режим отладки
     %Очищаем рабочую область
     clc; clear variables; close all;
     %Добавляем рабочие директории
-    addpath('Сигналы','Сигналы\20171220','Сигналы/31 km T16', 'Сигналы/ЗАТУХАНИЕ (сигнал)', 'Результаты'); %Исходные и выходные данные
+    addpath('Signals', 'Signals/31 km T16'); %Исходные и выходные данные
     addpath('Export_fig'); %Библиотека сохранения изображений
     
     %% +========================= Исходные данные ============================+    
     
     FileNameDisplacement = ''; %Имя файла c перемещениями
-    FileNameAccel = '20130924121219_1.txt'; %Имя файла c ускорениями
+    FileNameAccel = '20130924121219_2.txt'; %Имя файла c ускорениями
     StartReadNumbDisplacement = 12; %Номер отсчётной строки для перемещений
     StartReadNumbAccel = 12; %Номер отсчётной строки для ускорений
     SaveMode = false; %Режим сохранения файлов
     
-    LevelsStep = 3065; %Ширина уровня
+    LevelsStep = 3000; %Ширина уровня
     Accuracy = 1e-7; %Точность аппроксимации
     ShowNumb = 2; %Номер линий уровня для отображения
     CutProcent = 0.2; %Процент усечения фрагментов
@@ -59,7 +60,7 @@ if TestMode %Режим отладки
     DeltaLevelsStepProcent = 0.1; %Смещение границы уровней в долях
     AccuracySpectrum = 0.95; %Точность аппроксимации спектров
     NormalizeMode = 0; %Режим нормировки склеек
-    OverlapFactor = 0.5; %Коэффициент перекрытия уровней
+    OverlapFactor = 0.2; %Коэффициент перекрытия уровней
     
 end
 
@@ -122,22 +123,22 @@ end
 [PartsAccelApproxSpline,TableDecrementVisualize,PartsExpAccel,IndexPartsExpAccel,LimitsExpAccel] = FindExpDecrease(Accel,LimExpAccelLevel,AccuracyExp,FreqDecrement,SampleRate,ModelApprox);
 
     %Отсечение коротких фрагментов и нахождение производных для ускорений
-[FixPartsAccel PartsAccelDerivative IndexPartsAccel...
-    OscillationPartsAccel IndexOscillationPartsAccel] = FixNormalizeDerivative(PartsAccel, IndexPartsDisplacement, CutProcent, NormalizeMode);
+[FixPartsAccel,PartsAccelDerivative, IndexPartsAccel,...
+    ~, ~] = FixNormalizeDerivative(PartsAccel, IndexPartsDisplacement, CutProcent, NormalizeMode);
     %Отсечение коротких фрагментов и нахождение производных для пермещений
-[FixPartsDisplacement PartsDisplacementDerivative IndexPartsDisplacement...
-    OscillationPartsDisplacement IndexOscillationPartsDisplacement] = FixNormalizeDerivative(PartsDisplacement, IndexPartsDisplacement, CutProcent, NormalizeMode);  
+[FixPartsDisplacement PartsDisplacementDerivative IndexPartsDisplacement,...
+    ~, ~] = FixNormalizeDerivative(PartsDisplacement, IndexPartsDisplacement, CutProcent, NormalizeMode);  
     %Отсечение коротких фрагментов для экспонециального затухания с ускорений
-[FixPartsExpAccel, PartsExpAccelDerivative, IndexPartsExpAccel,~,~] = FixNormalizeDerivative(PartsExpAccel, IndexPartsExpAccel, CutProcent, NormalizeMode);  
+[FixPartsExpAccel, PartsExpAccelDerivative, IndexPartsExpAccel,...
+    ~,~] = FixNormalizeDerivative(PartsExpAccel, IndexPartsExpAccel, CutProcent, NormalizeMode);  
 
     %Выделение одномонотонных фрагментов по перемещениям
- ModeMonotone = 'Accel'; %Режим работы с монотонными фрагментами    
-[SignalIncrease{1} SignalDecrease{1} IndexIncrease{1} IndexDecrease{1}] = ConstructMonotoneFragments(DisplacementApprox,DisplacementApproxDerivative,Accel,ModeMonotone);
+[PartsMonotoneAccel, IndexMonotoneAccel] = ConstructMonotoneLevels(FixPartsAccel, FixPartsDisplacement, LineLevels);
     %Отсечение коротких фрагментов и нахождение производных для сигнала
-[FixSignalIncrease FixSignalIncreaseDerivative IndexFixSignalIncrease...
-    OscillationPartsSignalIncrease IndexOscillationPartsSignalIncrease] = FixNormalizeDerivative(SignalIncrease, IndexIncrease, CutProcent, NormalizeMode); %Обрезка и нормализация
-[FixSignalDecrease FixSignalDecreaseDerivative IndexFixSignalDecrease...
-    OscillationPartsSignalDecrease IndexOscillationPartsSignalDecrease] = FixNormalizeDerivative(SignalDecrease, IndexDecrease, CutProcent, NormalizeMode);
+for s = 1:length(PartsMonotoneAccel) %Цикл по Increase, Neutral, Decrease
+   [FixPartsMonotoneAccel{s},PartsMonotoneAccelDerivative{s},IndexPartsMonotoneAccel{s}...
+       ,~,~] = FixNormalizeDerivative(PartsMonotoneAccel{s}, IndexMonotoneAccel{s}, CutProcent, NormalizeMode); %Усечение и нормализация
+end
 
 switch CorrectLengthMode %Режим приведения фрагментов к длине
     case 'Maximum' %К максимальной
@@ -164,34 +165,27 @@ switch CorrectLengthMode %Режим приведения фрагментов к длине
         LengthCorrect = 0;   
 end
     %Склейка фрагментов для каждого уровня ускорений
-[PartsAccelGlued FailAccelGlued] = OptimalGluing(IndexPartsAccel,FixPartsAccel,PartsAccelDerivative,0.01,DepthGluing); %Ускорения
+[PartsAccelGlued, FailAccelGlued] = OptimalGluing(IndexPartsAccel,FixPartsAccel,PartsAccelDerivative,0.01,DepthGluing); %Ускорения
 
 [FixPartsExpAccelTurn, PartsExpAccelDerivativeTurn] = OverTurnFragments(FixPartsExpAccel,IndexPartsExpAccel,PartsExpAccelDerivative); %Поворот затухания
-[PartsExpAccelGlued FailExpAccelGlued] = OptimalGluing(IndexPartsExpAccel,FixPartsExpAccelTurn,PartsExpAccelDerivativeTurn,0.01,DepthGluing); %Экспонециальное затухание
+[PartsExpAccelGlued, FailExpAccelGlued] = OptimalGluing(IndexPartsExpAccel,FixPartsExpAccelTurn,PartsExpAccelDerivativeTurn,0.01,DepthGluing); %Экспонециальное затухание
     %Склейка фрагментов монотонных сигналов
-if strcmp(ModeMonotone,'Accel') %Проверка режима работа с монотонными частями Mode == 'Accel'
-    [SignalIncreaseGlued FailSignalIncreaseGlued] = OptimalGluing(IndexFixSignalIncrease,FixSignalIncrease,FixSignalIncreaseDerivative,0.01,DepthGluing);
-    [SignalDecreaseGlued FailSignalDecreaseGlued] = OptimalGluing(IndexFixSignalDecrease,FixSignalDecrease,FixSignalDecreaseDerivative,0.01,DepthGluing);
-    SignalNeutralGlued{1} = PartsAccelGlued{find(LineLevels(:,3) == 0)}; %Нулевой уровень
-else %Mode == 'Displacement'
-    SignalIncreaseGlued = SimpleGluing(FixSignalIncrease,IndexFixSignalIncrease);
-    SignalDecreaseGlued = SimpleGluing(FixSignalDecrease,IndexFixSignalDecrease);   
-    SignalNeutralGlued = SimpleGluing(FixPartsDisplacement,IndexPartsDisplacement); 
-    SignalNeutralGlued{1} = SignalNeutralGlued{find(LineLevels(:,3) == 0)}; %Нулевой уровень
+for s = 1:length(FixPartsMonotoneAccel) %Цикл по Increase, Neutral, Decrease
+    [PartsMonotoneAccelGlued{s}, FailPartsMonotoneAccelGlued{s}] = OptimalGluing(IndexPartsMonotoneAccel{s}, FixPartsMonotoneAccel{s}, PartsMonotoneAccelDerivative{s}, 0.01, DepthGluing);
+end
+    %Окончательное приведение фрагментов по длине
+PartsAccelGlued = CorrectLength(PartsAccelGlued, LengthCorrect, 0, DepthGluing); 
+PartsExpAccelGlued = CorrectLength(PartsExpAccelGlued, LengthCorrect, 0, DepthGluing);
+for s = 1:length(PartsMonotoneAccelGlued) %Цикл по Increase, Neutral, Decrease
+    PartsMonotoneAccelGlued{s} = CorrectLength(PartsMonotoneAccelGlued{s}, LengthCorrect, 0, DepthGluing);
 end
 
-    %Окончательное приведение фрагментов по длине
-PartsAccelGlued = CorrectLength(PartsAccelGlued,LengthCorrect,0,DepthGluing); 
-PartsExpAccelGlued = CorrectLength(PartsExpAccelGlued,LengthCorrect,0,DepthGluing);
-SignalIncreaseGlued = CorrectLength(SignalIncreaseGlued,LengthCorrect,0,DepthGluing); 
-SignalDecreaseGlued = CorrectLength(SignalDecreaseGlued,LengthCorrect,0,DepthGluing);   
-SignalNeutralGlued = CorrectLength(SignalNeutralGlued,LengthCorrect,0,DepthGluing);
-
     %Преобразование Фурье для склееных уровней сигнала
-[SpectrumAccelGluedVisualize FrequencyAccelGlued] = FindSpectrum(PartsAccelGlued, SampleRate, 0, 'Welch', AccuracySpectrum); %Спектр уровней
-SignalMonotoneGlued = {SignalDecreaseGlued{1} SignalNeutralGlued{1} SignalIncreaseGlued{1}}; %Общий сигнал монотонных фрагментов (-1,0,1)
-[SpectrumSignalMonotoneGluedVisualize FrequencySignalMonotoneGlued] = FindSpectrum(SignalMonotoneGlued, SampleRate, 0, 'Welch', AccuracySpectrum); %Спектр монотонных фрагментов
-[SpectrumExpAccelGluedVisualize FrequencyExpAccelGlued] = FindSpectrum(PartsExpAccelGlued, SampleRate, 0, 'Welch', AccuracySpectrum); %Спектр экспонецильно затухающих и нулевых фрагментов
+[SpectrumAccelGluedVisualize, FrequencyAccelGlued] = FindSpectrum(PartsAccelGlued, SampleRate, 0, 'Welch', AccuracySpectrum); %Спектр уровней
+for s = 1:length(PartsMonotoneAccelGlued) %Цикл по Increase, Neutral, Decrease
+    [SpectrumMonotoneAccelGluedVisualize{s}, FrequencyMonotoneAccelGlued{s}] = FindSpectrum(PartsMonotoneAccelGlued{s}, SampleRate, 0, 'Welch', AccuracySpectrum); %Спектр монотонных фрагментов
+end
+[SpectrumExpAccelGluedVisualize, FrequencyExpAccelGlued] = FindSpectrum(PartsExpAccelGlued, SampleRate, 0, 'Welch', AccuracySpectrum); %Спектр экспонецильно затухающих и нулевых фрагментов
 
     %Передача данных в вызывающую программу
 Result{1} = Accel; %Ускорения
@@ -200,9 +194,9 @@ Result{3} = PartsDisplacement; %Фрагментированные перемещения
 Result{4} = PartsAccelGlued; %Склееные по уровням ускорения
 Result{5} = FrequencyAccelGlued; %Частоты склееных ускорений
 Result{6} = SpectrumAccelGluedVisualize; %Поверхность спектра ускорений
-Result{7} = SignalMonotoneGlued; %Склейка монотонных фрагментов
-Result{8} = FrequencySignalMonotoneGlued; %Частоты скленных монотонных фрагментов
-Result{9} = SpectrumSignalMonotoneGluedVisualize; %Поверхность спектра монотонных фрагментов
+Result{7} = PartsMonotoneAccelGlued; %Склейка монотонных фрагментов
+Result{8} = FrequencyMonotoneAccelGlued; %Частоты скленных монотонных фрагментов
+Result{9} = SpectrumMonotoneAccelGluedVisualize; %Поверхность спектра монотонных фрагментов
 Result{10} = Time; %Время
 Result{11} = LevelsNumb; %Число уровней
 Result{12} = LineLevels; %Линии уровней
