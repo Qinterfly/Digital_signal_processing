@@ -1,5 +1,6 @@
-function OutputSaveRegressionInform(RegressionParams, Title, FileName, Path, InputFileName)
+function OutputSaveRegressionInform(RegressionParams, Title, FileName, Path, InputFileName, TechnicalData)
 %Сохранение результатов спектрального расчёта в виде таблиц в .xls формате
+%одним вызовом COM сервера Excel
 
 %Запись пути сохранения
 Path = strcat(Path,'\Результаты\',InputFileName);
@@ -52,24 +53,35 @@ for i = 1:LevelsNumb(1)
     end
 end
 
+%Запись технических сведений
+for i = 1:length(TechnicalData)
+    ResultTable{i,1} = (TechnicalData{i});
+end
+ResultTable{i + 1,1} = ''; %Отступ перед основными данными
+BeginTitleInd = i + 2; %Индекс начала основных данных
 %Запись заголовков 
 ShiftCol = 4; ShiftRow = ElementNumb + 1; %Величины смещения строк и столбцов
+
 for i = 1:LevelsNumb(1) %По строкам
-    xlswrite(FullFileName, Title{1}(i), SpreadSheet, strcat('A', num2str(2+(i-1)*ShiftRow))); 
+    ResultTable{BeginTitleInd + 1 + (i-1)*ShiftRow, 1} = Title{2}(i);
 end
 for i = 1:LevelsNumb(2) %По столбцам
-    xlswrite(FullFileName, Title{2}(i), SpreadSheet, strcat(XlRangeBase{2+ShiftCol*(i-1)}, '1')); 
+    ResultTable{BeginTitleInd, 2 + (i-1)*ShiftCol} = Title{1}(i);
 end
 
 %Запись данных
-Pointer = [2, 2]; %Приращение ячейки для записи (1 == 'A', N ==..)
+Pointer = [BeginTitleInd+1, 2]; %Приращение ячейки для записи (1 == 'A', N ==..)
 for i = 1:LevelsNumb(1)
     %Запись сведений о рассеянии
     for j = 1:LevelsNumb(2)
-       xlswrite(FullFileName, RegressionParams{i,j}, SpreadSheet, strcat(XlRangeBase{Pointer(2)+(j-1)*ShiftCol}, num2str(Pointer(1))));
+        TempCell = RegressionParams{i, j}; %Срез cell данных
+        for k = 1:length(TempCell)
+            ResultTable{Pointer(1)+k-1, Pointer(2)+(j-1)*ShiftCol} = TempCell{k};
+        end
     end 
     Pointer(1) = Pointer(1) + ShiftRow; %Приращение строки записи   
 end
+xlswrite(FullFileName, ResultTable, SpreadSheet); %Сохранение таблицы
 
 end
 
