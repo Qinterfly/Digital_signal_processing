@@ -27,11 +27,13 @@ for i = 1:length(OutputSignal)
     if ~isempty(OutputSignal{i})
         for m = 1:size(OutputSignal{i}, 1) %Цикл по строкам матрицы вывода
             for n = 1:size(OutputSignal{i}, 2) %Цикл по столбцам матрицы вывода,
-                ResultTable{BeginBaseInd + m, EndColInd + n-1} = OutputSignal{i}(m, n); %Запись сигнала уровня по столбцам с отступами
+                ResultTable{BeginBaseInd + m, EndColInd + n-1} = strrep(num2str(OutputSignal{i}(m, n)), '.', ','); %Запись сигнала уровня по столбцам с отступами в формате .xls
             end
         end
+        EndColInd = EndColInd + size(OutputSignal{i}, 2) + 1; %Приращение индекса последнего столбца
+    else
+        EndColInd = EndColInd + 2;
     end
-    EndColInd = EndColInd + size(OutputSignal{i}, 2) + 1; %Приращение индекса последнего столбца
 end
 xlswrite(FullFileName, ResultTable, SpreadSheet); %Сохранение таблицы
 

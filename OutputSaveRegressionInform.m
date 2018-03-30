@@ -76,7 +76,7 @@ for i = 1:LevelsNumb(1)
     for j = 1:LevelsNumb(2)
         TempCell = RegressionParams{i, j}; %Срез cell данных
         for k = 1:length(TempCell)
-            ResultTable{Pointer(1)+k-1, Pointer(2)+(j-1)*ShiftCol} = TempCell{k};
+            ResultTable{Pointer(1)+k-1, Pointer(2)+(j-1)*ShiftCol} = strrep(TempCell{k}, '.', ','); %Запись параметров рассеяния в формате Excel
         end
     end 
     Pointer(1) = Pointer(1) + ShiftRow; %Приращение строки записи   
