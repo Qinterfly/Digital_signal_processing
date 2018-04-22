@@ -4,6 +4,7 @@ function [RegressionTable, Title] = CalculateRegression(InputAccel, Accel, Monot
 ComplexTableSignal = []; Title.Rows = {}; Title.Cols = {}; %Таблица сигналов и заголовков по всем уровням
 
 %Составление массива сигналов по маске
+try
 for i = 1:length(RegressionArg)
     switch RegressionArg{i}
         case 'НУ' %Ускорения исходные
@@ -35,6 +36,11 @@ for i = 1:length(RegressionArg)
             end
             Title.Rows = [Title.Rows, CreateTitleNameByID([-1 0], RegressionArg{i})]; %Заголовки по строкам
     end
+end
+catch %Недостаточное число точек
+    for s = 1:3, RegressionTable{s} = 0; end
+    Title.Rows = 'Empty'; Title.Cols = 'Empty';
+    return
 end
 %Фильтрация пустых сигналов
 for i = size(ComplexTableSignal,2):-1:1
