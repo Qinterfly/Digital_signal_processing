@@ -20,11 +20,11 @@ function Result = ProofAccel(FileNameDisplacement,... %Имя файла c перемещениями
 %% +==================== Информация о программе ==========================+
 
 %   Автор: П.А. Лакиза.
-%   Версия: 3.4
+%   Версия: 3.5
 %   Изменения:   
-%   - Улучшен алгоритм сохранение таблиц в .xls формат
-%   - Исправлены ошибки формата вывода
-%  Дата: 30.03.2017
+%   - Добавлен вывод полной регрессионной таблицы
+%   - Добавлено отображение тепловых карт
+%  Дата: 22.04.2018
 
 %% +========================= Служебный блок =============================+
 
@@ -103,7 +103,7 @@ if CorrectDisplacement %Проверка режима коррекции линейного дрейфа
     Displacement = LineCorrect(Time, Displacement); %Отсечение низкочастотной части сигнала перемещений
 end
     %Аппроксимация функции перемещений
-[DisplacementApprox DisplacementApproxDerivative] = ApproxSpline(Time,Displacement,Accuracy,1); %Аппроксимация B-сплайнами
+[DisplacementApprox DisplacementApproxDerivative] = ApproxSpline(Time, Time, Displacement,Accuracy,1); %Аппроксимация B-сплайнами
     %Выделение уровней
 LineLevels = CreateLevels(DisplacementApprox, LevelsStep, OverlapFactor); 
 LevelsNumb = size(LineLevels, 1); %Число уровней сигнала
@@ -211,6 +211,14 @@ Result{21} = PartsAccelApproxSpline; %Аппроксимирующие сплайны для каждого пика
 
 % return;
 %% Отладка
+
+% TimeInput = FrequencyExpAccelGlued;
+% TimeInterpolate = FrequencyAccelGlued;
+% Signal = SpectrumExpAccelGluedVisualize(:,1);
+% [SignalApprox,~] = ApproxSpline(TimeInput, TimeInterpolate, Signal, 1, 0); %Вычисление значений функции для заданного дискретного набора точек
+% plot(TimeInput, Signal);
+% grid on; hold on;
+% plot(TimeInterpolate, SignalApprox);
 % 
 % figure
 % grid on;

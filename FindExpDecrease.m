@@ -31,7 +31,7 @@ for i = 1:length(Signal)
 end
     %Находим концы фрагментов 
 for s = [1 3] %Фрагменты выше и ниже оси
-    [ExpSignalApprox ExpSignalApproxDerivative] = ApproxSpline(PartsExpSignalTemp{s}(:,1),PartsExpSignalTemp{s}(:,2),AccuracyExp,2); %Аппроксимация B-сплайнами
+    [ExpSignalApprox ExpSignalApproxDerivative] = ApproxSpline(PartsExpSignalTemp{s}(:,1),PartsExpSignalTemp{s}(:,1),PartsExpSignalTemp{s}(:,2),AccuracyExp,2); %Аппроксимация B-сплайнами
     k = 1;
     for i = 1:length(ExpSignalApproxDerivative) - 1
         if ExpSignalApproxDerivative(i+1)*ExpSignalApproxDerivative(i) < 0 %Отыскание корня
@@ -61,7 +61,7 @@ for s = [1 3] %Фрагменты выше и ниже оси
         try
             switch ModelApprox %Модель аппроксимации затухания
                 case 'B-Spline'
-                    [ResultTemp, ~] = ApproxSpline(Xdata,Ydata,AccuracyExp,0); %Аппроксимация B-сплайнами
+                    [ResultTemp, ~] = ApproxSpline(Xdata,Xdata,Ydata,AccuracyExp,0); %Аппроксимация B-сплайнами
                 case 'Exponential'
                     FitModel = fittype('exp2');
                     FitFun = fit(Xdata,Ydata,FitModel); %Построение модели

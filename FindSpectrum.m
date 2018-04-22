@@ -32,12 +32,12 @@ switch Mode
         end
     case 'Welch' %Спектральная плотность мощности по Уэлчу
         for i = 1:LevelsNumb %Цикл по всем уровням
-            [SpectrumSignal{i}, Frequency] = pwelch(PartsSignalGlued{i}(:,2), MinNFFT/2, MinNFFT/4, MinNFFT, SampleRate/100);
+            [SpectrumSignal{i}, Frequency] = pwelch(PartsSignalGlued{i}(:,2), MinNFFT/2, MinNFFT/4, MinNFFT, 1/(SampleRate*1e-6));
         end
 end
 %Аппроксимирование спектра
 for i = 1:LevelsNumb
-    [SpectrumSignal{i},~] = ApproxSpline(Frequency, SpectrumSignal{i}, Accuracy, 0);
+    [SpectrumSignal{i},~] = ApproxSpline(Frequency, Frequency, SpectrumSignal{i}, Accuracy, 0);
 end
 %Создание матрицы для визуализации
 SpectrumSignalVisualize = zeros(LevelsNumb, MinNFFT/2); %Выделяем память для таблицы визуализации

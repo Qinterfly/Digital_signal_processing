@@ -4,5 +4,6 @@ Doc/
 Signals/
 Tensor/
 Theory/
+Archive/
 *.png
 *.txt
