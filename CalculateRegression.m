@@ -2,6 +2,8 @@ function [RegressionTable, Title] = CalculateRegression(InputAccel, Accel, Monot
 %Создание таблицы регрессионных коэффициентов по заданным аргументам.
 
 ComplexTableSignal = []; Title.Rows = {}; Title.Cols = {}; %Таблица сигналов и заголовков по всем уровням
+ParamsNumb.Full = 3; %Число параметров для табличного анализа
+ParamsNumb.Vec = 2; %Число параметров для векторного анализа
 
 %Составление массива сигналов по маске
 try
@@ -38,7 +40,7 @@ for i = 1:length(RegressionArg)
     end
 end
 catch %Недостаточное число точек
-    for s = 1:3, RegressionTable{s} = 0; end
+    for s = 1:ParamsNumb.Full + ParamsNumb.Vec, RegressionTable{s} = 0; end
     Title.Rows = 'Empty'; Title.Cols = 'Empty';
     return
 end
@@ -53,20 +55,31 @@ Title.Cols = Title.Rows; %Placeholder
 ColsNumb = size(ComplexTableSignal, 2); %Число колонок
 
 %Инициализация полей структуры
-for s = 1:3
+    %Табличный
+for s = 1:ParamsNumb.Full
     RegressionTable{s} = zeros(ColsNumb); %Таблица [угловых коэффициентов, дистанций рассеяния, длин кривых]
+end
+    %Векторный
+for s = ParamsNumb.Full + 1:ParamsNumb.Full + ParamsNumb.Vec
+    RegressionTable{s} = zeros(ColsNumb,1); %Таблица [амплитуда, максимальная частота]
 end
 %Вычисление регресионных параметров по сигналам
 for i = 1:ColsNumb 
    BaseSignal = ComplexTableSignal(:,i); %Основной сигнал
+   %Вычисление параметров регрессии
+   [MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal);  %Максимумы рассеяния
+   FreqMaxBaseSignal = FrequencyInputAccel(MaxBaseSignalInd);  %Частоты
+   %Запись результатов расчёта
+   RegressionTable{4}(i) = MaxBaseSignal; %Амплитуда сигнала
+   RegressionTable{5}(i) = FreqMaxBaseSignal; %Частота сигнала
    for j = 1:ColsNumb 
        ShowSignal = ComplexTableSignal(:,j); %Сигнал для сравнения
        %Построение линейной регрессии
        LinearRegressionCoeffs = polyfit(BaseSignal, ShowSignal, 1); %Коэффициенты для линейной регрессии
        LinearRegressionFun = polyval(LinearRegressionCoeffs, BaseSignal); %Вычисление значений линейной регрессии
        DistanceScatter = sum(abs(ShowSignal - LinearRegressionFun)); %Дистанция рассеяния
-       %[MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal); [MaxShowSignal MaxShowSignalInd] = max(ShowSignal); %Максимумы рассеяния
-       %FreqMaxBaseSignal = Frequency(MaxBaseSignalInd); FreqMaxShowSignal = Frequency(MaxShowSignalInd); %Частоты
+       %[MaxShowSignal MaxShowSignalInd] = max(ShowSignal); %[MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal);  %Максимумы рассеяния
+       %FreqMaxShowSignal = Frequency(MaxShowSignalInd); %FreqMaxBaseSignal = Frequency(MaxBaseSignalInd);  %Частоты
        LengthCurve = 0; %Инициализация длины кривой
        for p = 1:length(BaseSignal) - 1
            LengthCurve = LengthCurve + sqrt((BaseSignal(p+1) - BaseSignal(p))^2 + (ShowSignal(p+1) - ShowSignal(p))^2); %Длина кривой
