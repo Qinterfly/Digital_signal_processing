@@ -1,22 +1,22 @@
 function [FixPartsSignalTurn, FixPartsSignalDerivativeTurn] = OverTurnFragments(FixPartsSignal,IndexPartsSignal,FixPartsSignalDerivative)
-%Переворот фрагментов перед склейкой
+%РџРµСЂРµРІРѕСЂРѕС‚ С„СЂР°РіРјРµРЅС‚РѕРІ РїРµСЂРµРґ СЃРєР»РµР№РєРѕР№
 
-LevelsNumb = length(IndexPartsSignal); %Число уровней
-for i = 1:LevelsNumb %Цикл по числу уровней
-    SaveIndex = 0; %Номер конца предыдущего фрагмента
+LevelsNumb = length(IndexPartsSignal); %Р§РёСЃР»Рѕ СѓСЂРѕРІРЅРµР№
+for i = 1:LevelsNumb %Р¦РёРєР» РїРѕ С‡РёСЃР»Сѓ СѓСЂРѕРІРЅРµР№
+    SaveIndex = 0; %РќРѕРјРµСЂ РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
     for j = 1:length(IndexPartsSignal{i})
-        if rem(j,2) %Если индекс четный
+        if rem(j,2) %Р•СЃР»Рё РёРЅРґРµРєСЃ С‡РµС‚РЅС‹Р№
             for s = SaveIndex + 1:IndexPartsSignal{i}(j)
-                FixPartsSignalTurn{i}(s,:) = [FixPartsSignal{i}(s,1), -FixPartsSignal{i}(IndexPartsSignal{i}(j) - s + 1,2), FixPartsSignal{i}(s,3)]; %Поворачиваем фрагменты (X-Y) с сохранением номеров
-                FixPartsSignalDerivativeTurn{i}(s,:) = [FixPartsSignalDerivative{i}(s,1), FixPartsSignalDerivative{i}(IndexPartsSignal{i}(j) - s + 1,2), FixPartsSignalDerivative{i}(s,3)]; %Поворот производной
+                FixPartsSignalTurn{i}(s,:) = [FixPartsSignal{i}(s,1), -FixPartsSignal{i}(IndexPartsSignal{i}(j) - s + 1,2), FixPartsSignal{i}(s,3)]; %РџРѕРІРѕСЂР°С‡РёРІР°РµРј С„СЂР°РіРјРµРЅС‚С‹ (X-Y) СЃ СЃРѕС…СЂР°РЅРµРЅРёРµРј РЅРѕРјРµСЂРѕРІ
+                FixPartsSignalDerivativeTurn{i}(s,:) = [FixPartsSignalDerivative{i}(s,1), FixPartsSignalDerivative{i}(IndexPartsSignal{i}(j) - s + 1,2), FixPartsSignalDerivative{i}(s,3)]; %РџРѕРІРѕСЂРѕС‚ РїСЂРѕРёР·РІРѕРґРЅРѕР№
             end
         else
             for s = SaveIndex + 1:IndexPartsSignal{i}(j)
-                FixPartsSignalTurn{i}(s,:) = [FixPartsSignal{i}(s,1), FixPartsSignal{i}(s,2), FixPartsSignal{i}(s,3)]; %Простая перезапись фрагмента
-                FixPartsSignalDerivativeTurn{i}(s,:) = [FixPartsSignalDerivative{i}(s,1), FixPartsSignalDerivative{i}(s,2), FixPartsSignalDerivative{i}(s,3)]; %Простая перезапись производной
+                FixPartsSignalTurn{i}(s,:) = [FixPartsSignal{i}(s,1), FixPartsSignal{i}(s,2), FixPartsSignal{i}(s,3)]; %РџСЂРѕСЃС‚Р°СЏ РїРµСЂРµР·Р°РїРёСЃСЊ С„СЂР°РіРјРµРЅС‚Р°
+                FixPartsSignalDerivativeTurn{i}(s,:) = [FixPartsSignalDerivative{i}(s,1), FixPartsSignalDerivative{i}(s,2), FixPartsSignalDerivative{i}(s,3)]; %РџСЂРѕСЃС‚Р°СЏ РїРµСЂРµР·Р°РїРёСЃСЊ РїСЂРѕРёР·РІРѕРґРЅРѕР№
             end
         end
-        SaveIndex = IndexPartsSignal{i}(j); %Приращение индекса конца предыдущего фрагмента
+        SaveIndex = IndexPartsSignal{i}(j); %РџСЂРёСЂР°С‰РµРЅРёРµ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
     end
 end
 end

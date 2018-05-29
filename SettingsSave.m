@@ -1,27 +1,27 @@
 function SettingsSave(SettingsOutput, Path, InputFileName)
-%Сохранение настроек расчёта
+%РЎРѕС…СЂР°РЅРµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє СЂР°СЃС‡С‘С‚Р°
 
-if ~isempty(SettingsOutput) && size(SettingsOutput,2) ~= 2 %Проверка формы вывода данных
-    error('Некорректная форма вывода настроек программы');
+if ~isempty(SettingsOutput) && size(SettingsOutput,2) ~= 2 %РџСЂРѕРІРµСЂРєР° С„РѕСЂРјС‹ РІС‹РІРѕРґР° РґР°РЅРЅС‹С…
+    error('РќРµРєРѕСЂСЂРµРєС‚РЅР°СЏ С„РѕСЂРјР° РІС‹РІРѕРґР° РЅР°СЃС‚СЂРѕРµРє РїСЂРѕРіСЂР°РјРјС‹');
 end
-Path = strcat(Path,'\Результаты\',InputFileName);
+Path = strcat(Path,'\Р РµР·СѓР»СЊС‚Р°С‚С‹\',InputFileName);
 if ~isdir(Path)
-   mkdir(Path); %Создание директории для данного сигнала 
+   mkdir(Path); %РЎРѕР·РґР°РЅРёРµ РґРёСЂРµРєС‚РѕСЂРёРё РґР»СЏ РґР°РЅРЅРѕРіРѕ СЃРёРіРЅР°Р»Р° 
 end
-fileID = fopen(strcat(Path,'/','Settings.txt'),'w'); %Открытие файла для записи
-for i = 1:length(SettingsOutput) %Цикл по всем строкам
-    if ischar(SettingsOutput{i,2}) %Проверка символьного типа
-        if isempty(SettingsOutput{i,2}) %Проверка пустоты строки
-            fprintf(fileID,'%s = %s\r\n',SettingsOutput{i,1},'null'); %Запись настроек в файл            
+fileID = fopen(strcat(Path,'/','Settings.txt'),'w'); %РћС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р° РґР»СЏ Р·Р°РїРёСЃРё
+for i = 1:length(SettingsOutput) %Р¦РёРєР» РїРѕ РІСЃРµРј СЃС‚СЂРѕРєР°Рј
+    if ischar(SettingsOutput{i,2}) %РџСЂРѕРІРµСЂРєР° СЃРёРјРІРѕР»СЊРЅРѕРіРѕ С‚РёРїР°
+        if isempty(SettingsOutput{i,2}) %РџСЂРѕРІРµСЂРєР° РїСѓСЃС‚РѕС‚С‹ СЃС‚СЂРѕРєРё
+            fprintf(fileID,'%s = %s\r\n',SettingsOutput{i,1},'null'); %Р—Р°РїРёСЃСЊ РЅР°СЃС‚СЂРѕРµРє РІ С„Р°Р№Р»            
         else
-            fprintf(fileID,'%s = %s\r\n',SettingsOutput{i,1},SettingsOutput{i,2}); %Запись настроек в файл
+            fprintf(fileID,'%s = %s\r\n',SettingsOutput{i,1},SettingsOutput{i,2}); %Р—Р°РїРёСЃСЊ РЅР°СЃС‚СЂРѕРµРє РІ С„Р°Р№Р»
         end
     elseif SettingsOutput{i,2} < 1e-3 && SettingsOutput{i,2} ~= 0
-        fprintf(fileID,'%s = %e\r\n',SettingsOutput{i,1},SettingsOutput{i,2}); %Запись настроек в файл        
+        fprintf(fileID,'%s = %e\r\n',SettingsOutput{i,1},SettingsOutput{i,2}); %Р—Р°РїРёСЃСЊ РЅР°СЃС‚СЂРѕРµРє РІ С„Р°Р№Р»        
     else
-        fprintf(fileID,'%s = %4.4f\r\n',SettingsOutput{i,1},SettingsOutput{i,2}); %Запись настроек в файл
+        fprintf(fileID,'%s = %4.4f\r\n',SettingsOutput{i,1},SettingsOutput{i,2}); %Р—Р°РїРёСЃСЊ РЅР°СЃС‚СЂРѕРµРє РІ С„Р°Р№Р»
     end
 end
-fclose(fileID); %Закрытие файла
+fclose(fileID); %Р—Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 end
 

@@ -1,23 +1,23 @@
 function [InputData,TechnicalData,Signal] = ReadInput(FileName,StartReadNumb)
-%Считывание файла c исходными данными
+%РЎС‡РёС‚С‹РІР°РЅРёРµ С„Р°Р№Р»Р° c РёСЃС…РѕРґРЅС‹РјРё РґР°РЅРЅС‹РјРё
 
-fileID = fopen(FileName,'r'); %Открытие файла для считывания
-InputData = textscan(fileID,'%s', 'delimiter', '\n', 'whitespace', ''); %Считывание данных из файла
-fclose(fileID); %Закрытие файла
-Swap = InputData{1}; InputData = Swap; %Перезапись считанных данных
-InputDataClone = InputData; %Копия исходного сигнала
-for i = 1:StartReadNumb - 1 %Цикл до начала сигнала
-    TechnicalData{i,1} = InputData{i}; %Сохранение технических сведений
-    InputDataClone{i} = {}; %Обнуление строк с техническими сведениями
+fileID = fopen(FileName,'r'); %РћС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р° РґР»СЏ СЃС‡РёС‚С‹РІР°РЅРёСЏ
+InputData = textscan(fileID,'%s', 'delimiter', '\n', 'whitespace', ''); %РЎС‡РёС‚С‹РІР°РЅРёРµ РґР°РЅРЅС‹С… РёР· С„Р°Р№Р»Р°
+fclose(fileID); %Р—Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
+Swap = InputData{1}; InputData = Swap; %РџРµСЂРµР·Р°РїРёСЃСЊ СЃС‡РёС‚Р°РЅРЅС‹С… РґР°РЅРЅС‹С…
+InputDataClone = InputData; %РљРѕРїРёСЏ РёСЃС…РѕРґРЅРѕРіРѕ СЃРёРіРЅР°Р»Р°
+for i = 1:StartReadNumb - 1 %Р¦РёРєР» РґРѕ РЅР°С‡Р°Р»Р° СЃРёРіРЅР°Р»Р°
+    TechnicalData{i,1} = InputData{i}; %РЎРѕС…СЂР°РЅРµРЅРёРµ С‚РµС…РЅРёС‡РµСЃРєРёС… СЃРІРµРґРµРЅРёР№
+    InputDataClone{i} = {}; %РћР±РЅСѓР»РµРЅРёРµ СЃС‚СЂРѕРє СЃ С‚РµС…РЅРёС‡РµСЃРєРёРјРё СЃРІРµРґРµРЅРёСЏРјРё
 end
-TempData = InputDataClone(~cellfun('isempty',InputDataClone)); %Удаляем технические сведения
-if ~isempty(i) %Если имеются техническе сведения о сигнале
-    PhysicalFactor = str2num(TechnicalData{7}); %Физический множитель сигнала
+TempData = InputDataClone(~cellfun('isempty',InputDataClone)); %РЈРґР°Р»СЏРµРј С‚РµС…РЅРёС‡РµСЃРєРёРµ СЃРІРµРґРµРЅРёСЏ
+if ~isempty(i) %Р•СЃР»Рё РёРјРµСЋС‚СЃСЏ С‚РµС…РЅРёС‡РµСЃРєРµ СЃРІРµРґРµРЅРёСЏ Рѕ СЃРёРіРЅР°Р»Рµ
+    PhysicalFactor = str2num(TechnicalData{7}); %Р¤РёР·РёС‡РµСЃРєРёР№ РјРЅРѕР¶РёС‚РµР»СЊ СЃРёРіРЅР°Р»Р°
     for i = 1:length(TempData)
-        Signal(i,:) = PhysicalFactor*str2num(TempData{i}); %Формируем временной сигнал
+        Signal(i,:) = PhysicalFactor*str2num(TempData{i}); %Р¤РѕСЂРјРёСЂСѓРµРј РІСЂРµРјРµРЅРЅРѕР№ СЃРёРіРЅР°Р»
     end
 else
-    TechnicalData = []; Signal = []; %Обнуление переменных
+    TechnicalData = []; Signal = []; %РћР±РЅСѓР»РµРЅРёРµ РїРµСЂРµРјРµРЅРЅС‹С…
 end
 end
 

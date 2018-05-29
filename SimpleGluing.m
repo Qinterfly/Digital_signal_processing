@@ -1,30 +1,30 @@
 function [SignalGlued] = SimpleGluing(Signal,Index)
-%Простая склейка фрагментов по концам
+%РџСЂРѕСЃС‚Р°СЏ СЃРєР»РµР№РєР° С„СЂР°РіРјРµРЅС‚РѕРІ РїРѕ РєРѕРЅС†Р°Рј
 
 if iscell(Signal) && iscell(Index)
-    LevelsNumb = length(Signal); %Запись числа уровней
+    LevelsNumb = length(Signal); %Р—Р°РїРёСЃСЊ С‡РёСЃР»Р° СѓСЂРѕРІРЅРµР№
     for s = 1:LevelsNumb
-        %Соединение фрагментов
+        %РЎРѕРµРґРёРЅРµРЅРёРµ С„СЂР°РіРјРµРЅС‚РѕРІ
         if ~isempty(Index{s})
             SaveIndex = Index{s}(1);
             for i = 2:length(Index{s})
-                MarkValue = Signal{s}(SaveIndex,2); %Оценочное значение
-                Different = Signal{s}(SaveIndex + 1,2) - MarkValue; %Разница концов
+                MarkValue = Signal{s}(SaveIndex,2); %РћС†РµРЅРѕС‡РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
+                Different = Signal{s}(SaveIndex + 1,2) - MarkValue; %Р Р°Р·РЅРёС†Р° РєРѕРЅС†РѕРІ
                 for j = SaveIndex + 1:Index{s}(i)
-                    Signal{s}(j,2) = Signal{s}(j,2) - Different; %Сдвиг фрагмента
+                    Signal{s}(j,2) = Signal{s}(j,2) - Different; %РЎРґРІРёРі С„СЂР°РіРјРµРЅС‚Р°
                 end
                 SaveIndex = Index{s}(i);
             end
-            %Удаление стыковых точек
+            %РЈРґР°Р»РµРЅРёРµ СЃС‚С‹РєРѕРІС‹С… С‚РѕС‡РµРє
             Delete = sort(Index{s},'descend');
             for i = 2:length(Delete)
-                Signal{s}(Delete(i) + 1,:) = []; %Удаление стыковых точек с конца
+                Signal{s}(Delete(i) + 1,:) = []; %РЈРґР°Р»РµРЅРёРµ СЃС‚С‹РєРѕРІС‹С… С‚РѕС‡РµРє СЃ РєРѕРЅС†Р°
             end
-            IndexGlued{s} = find(Signal{s}(:,3) == 1); %Обновляем массив индексов фрагментов
-            Signal{s}(:,2) = Signal{s}(:,2) - Signal{s}(1,2); %Отнулевой сигнал
-            SignalGlued{s} = Signal{s}; %Склееный отнулевой сигнал
+            IndexGlued{s} = find(Signal{s}(:,3) == 1); %РћР±РЅРѕРІР»СЏРµРј РјР°СЃСЃРёРІ РёРЅРґРµРєСЃРѕРІ С„СЂР°РіРјРµРЅС‚РѕРІ
+            Signal{s}(:,2) = Signal{s}(:,2) - Signal{s}(1,2); %РћС‚РЅСѓР»РµРІРѕР№ СЃРёРіРЅР°Р»
+            SignalGlued{s} = Signal{s}; %РЎРєР»РµРµРЅС‹Р№ РѕС‚РЅСѓР»РµРІРѕР№ СЃРёРіРЅР°Р»
         else
-            SignalGlued{s} = []; %Пустой сигнал
+            SignalGlued{s} = []; %РџСѓСЃС‚РѕР№ СЃРёРіРЅР°Р»
         end
     end
 end

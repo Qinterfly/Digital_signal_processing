@@ -1,71 +1,71 @@
 function [PartsSignalGlued Fail] = OptimalGluing(IndexPartsSignal,FixPartsSignal,PartsSignalDerivative,CutIntervalProcent,ShiftIntervalProcent)
-%Склейка концов фрагментов по критерию минимума среднего между разницей по
-%сигнала и производной от сигнала
-%ShiftIntervalProcent - смещение конца предыдущего отрезка в процентах
-%CutIntervalProcent - глубина прохода для склейки
+%РЎРєР»РµР№РєР° РєРѕРЅС†РѕРІ С„СЂР°РіРјРµРЅС‚РѕРІ РїРѕ РєСЂРёС‚РµСЂРёСЋ РјРёРЅРёРјСѓРјР° СЃСЂРµРґРЅРµРіРѕ РјРµР¶РґСѓ СЂР°Р·РЅРёС†РµР№ РїРѕ
+%СЃРёРіРЅР°Р»Сѓ Рё РµРіРѕ РїСЂРѕРёР·РІРѕРґРЅРѕР№
+%ShiftIntervalProcent - СЃРјРµС‰РµРЅРёРµ РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ РѕС‚СЂРµР·РєР° РІ РїСЂРѕС†РµРЅС‚Р°С…
+%CutIntervalProcent - РіР»СѓР±РёРЅР° РїСЂРѕС…РѕРґР° РґР»СЏ СЃРєР»РµР№РєРё
 
 LevelsNumb = length(IndexPartsSignal);
 for i = 1:LevelsNumb
-    if isempty(IndexPartsSignal{i}) %Обработка пустого уровня
+    if isempty(IndexPartsSignal{i}) %РћР±СЂР°Р±РѕС‚РєР° РїСѓСЃС‚РѕРіРѕ СѓСЂРѕРІРЅСЏ
         PartsSignalGlued{i} = zeros(500,2); 
     else
-        SaveIndex = IndexPartsSignal{i}(1); %Номер конца предыдущего фрагмента
-        PartsSignalGlued{i} = FixPartsSignal{i}(1:SaveIndex,:); %Запись показаний сигнала для предыдущего фрагмента
-        PartsSignalDerivativeGlued{i} = PartsSignalDerivative{i}(1:SaveIndex,:); %Запись производных для предыдушего фрагмента
-        Fail{i} = 0; %Обнуление счётчика ошибок для текущего уровня
+        SaveIndex = IndexPartsSignal{i}(1); %РќРѕРјРµСЂ РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+        PartsSignalGlued{i} = FixPartsSignal{i}(1:SaveIndex,:); %Р—Р°РїРёСЃСЊ РїРѕРєР°Р·Р°РЅРёР№ СЃРёРіРЅР°Р»Р° РґР»СЏ РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+        PartsSignalDerivativeGlued{i} = PartsSignalDerivative{i}(1:SaveIndex,:); %Р—Р°РїРёСЃСЊ РїСЂРѕРёР·РІРѕРґРЅС‹С… РґР»СЏ РїСЂРµРґС‹РґСѓС€РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+        Fail{i} = 0; %РћР±РЅСѓР»РµРЅРёРµ СЃС‡С‘С‚С‡РёРєР° РѕС€РёР±РѕРє РґР»СЏ С‚РµРєСѓС‰РµРіРѕ СѓСЂРѕРІРЅСЏ
         for j = 2:length(IndexPartsSignal{i})
-            LengthIntervalRight = IndexPartsSignal{i}(j) - SaveIndex; %Длина текущего фрагмента
+            LengthIntervalRight = IndexPartsSignal{i}(j) - SaveIndex; %Р”Р»РёРЅР° С‚РµРєСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
             IndexFrag = find(PartsSignalGlued{i}(:,3) == 1);
-            if length(IndexFrag) ~= 1 %Проверка первого фрагмента
-                LengthIntervalLeft = IndexFrag(end) - IndexFrag(end - 1); %Длина левого фрагмента
+            if length(IndexFrag) ~= 1 %РџСЂРѕРІРµСЂРєР° РїРµСЂРІРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+                LengthIntervalLeft = IndexFrag(end) - IndexFrag(end - 1); %Р”Р»РёРЅР° Р»РµРІРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
             else
                 LengthIntervalLeft = IndexFrag;
             end
-            CutValue = ceil(CutIntervalProcent*LengthIntervalRight); %Число точек для среза справа
-            ShiftValue = ceil(ShiftIntervalProcent*LengthIntervalLeft); %Число точек для оценки слева
-            ErrorComplex = {}; %Обнуление массива погрешностей
+            CutValue = ceil(CutIntervalProcent*LengthIntervalRight); %Р§РёСЃР»Рѕ С‚РѕС‡РµРє РґР»СЏ СЃСЂРµР·Р° СЃРїСЂР°РІР°
+            ShiftValue = ceil(ShiftIntervalProcent*LengthIntervalLeft); %Р§РёСЃР»Рѕ С‚РѕС‡РµРє РґР»СЏ РѕС†РµРЅРєРё СЃР»РµРІР°
+            ErrorComplex = {}; %РћР±РЅСѓР»РµРЅРёРµ РјР°СЃСЃРёРІР° РїРѕРіСЂРµС€РЅРѕСЃС‚РµР№
             MinErrorLocal = []; 
             for m = 0:ShiftValue
-                MarkValueSignal = PartsSignalGlued{i}(end - m,2); %Значение ускорения конца предыдущего фрагмента
-                MarkValueSignallDerivative = PartsSignalDerivativeGlued{i}(end - m,2); %Значение производной от ускорения конца предыдущего фрагмента
-                ErrorComplex{m + 1} = []; %Обнулением комплекса оценки
-                k = 1; %Фиктивный счётчик точек
-                for s = SaveIndex + 1:IndexPartsSignal{i}(j) - CutValue %Цикл по всем точкам следующего фрагмента до среза
+                MarkValueSignal = PartsSignalGlued{i}(end - m,2); %Р—РЅР°С‡РµРЅРёРµ СѓСЃРєРѕСЂРµРЅРёСЏ РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+                MarkValueSignallDerivative = PartsSignalDerivativeGlued{i}(end - m,2); %Р—РЅР°С‡РµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅРѕР№ РѕС‚ СѓСЃРєРѕСЂРµРЅРёСЏ РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+                ErrorComplex{m + 1} = []; %РћР±РЅСѓР»РµРЅРёРµРј РєРѕРјРїР»РµРєСЃР° РѕС†РµРЅРєРё
+                k = 1; %Р¤РёРєС‚РёРІРЅС‹Р№ СЃС‡С‘С‚С‡РёРє С‚РѕС‡РµРє
+                for s = SaveIndex + 1:IndexPartsSignal{i}(j) - CutValue %Р¦РёРєР» РїРѕ РІСЃРµРј С‚РѕС‡РєР°Рј СЃР»РµРґСѓСЋС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р° РґРѕ СЃСЂРµР·Р°
                     if PartsSignalDerivative{i}(s,2)*MarkValueSignallDerivative >= 0
-                        ErrorComplex{m + 1}(k,1) = s; %Глобальный номер точки
-                        ErrorComplex{m + 1}(k,2) = abs(FixPartsSignal{i}(s,2) - MarkValueSignal); %Разница ускорений
-                        ErrorComplex{m + 1}(k,3) = abs(PartsSignalDerivative{i}(s,2) - MarkValueSignallDerivative); %Разница производных от ускорений
-                        ErrorComplex{m + 1}(k,4) = (ErrorComplex{m + 1}(k,2) + ErrorComplex{m + 1}(k,3))/2; %Среднее между разницей ускорений и производной от ускорений (быстрее mean)
-                        k = k + 1; %Приращение счётчика точек
+                        ErrorComplex{m + 1}(k,1) = s; %Р“Р»РѕР±Р°Р»СЊРЅС‹Р№ РЅРѕРјРµСЂ С‚РѕС‡РєРё
+                        ErrorComplex{m + 1}(k,2) = abs(FixPartsSignal{i}(s,2) - MarkValueSignal); %Р Р°Р·РЅРёС†Р° СѓСЃРєРѕСЂРµРЅРёР№
+                        ErrorComplex{m + 1}(k,3) = abs(PartsSignalDerivative{i}(s,2) - MarkValueSignallDerivative); %Р Р°Р·РЅРёС†Р° РїСЂРѕРёР·РІРѕРґРЅС‹С… РѕС‚ СѓСЃРєРѕСЂРµРЅРёР№
+                        ErrorComplex{m + 1}(k,4) = (ErrorComplex{m + 1}(k,2) + ErrorComplex{m + 1}(k,3))/2; %РЎСЂРµРґРЅРµРµ РјРµР¶РґСѓ СЂР°Р·РЅРёС†РµР№ СѓСЃРєРѕСЂРµРЅРёР№ Рё РїСЂРѕРёР·РІРѕРґРЅРѕР№ РѕС‚ СѓСЃРєРѕСЂРµРЅРёР№ (Р±С‹СЃС‚СЂРµРµ mean)
+                        k = k + 1; %РџСЂРёСЂР°С‰РµРЅРёРµ СЃС‡С‘С‚С‡РёРєР° С‚РѕС‡РµРє
                     end
                 end
-                if ~isempty(ErrorComplex{m + 1}) %Проверка наличия оптимальных точек
-                    [MinErrorLocal(m + 1) NumbErrorRowLocal(m + 1)] = min(ErrorComplex{m + 1}(1:end,4)); %Нахождение локального номера точки начала следующего фрагмента
+                if ~isempty(ErrorComplex{m + 1}) %РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РѕРїС‚РёРјР°Р»СЊРЅС‹С… С‚РѕС‡РµРє
+                    [MinErrorLocal(m + 1) NumbErrorRowLocal(m + 1)] = min(ErrorComplex{m + 1}(1:end,4)); %РќР°С…РѕР¶РґРµРЅРёРµ Р»РѕРєР°Р»СЊРЅРѕРіРѕ РЅРѕРјРµСЂР° С‚РѕС‡РєРё РЅР°С‡Р°Р»Р° СЃР»РµРґСѓСЋС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
                 else
-                    MinErrorLocal(m + 1) = Inf; %Для избежания потери индекса (смещения)
+                    MinErrorLocal(m + 1) = Inf; %Р”Р»СЏ РёР·Р±РµР¶Р°РЅРёСЏ РїРѕС‚РµСЂРё РёРЅРґРµРєСЃР° (СЃРјРµС‰РµРЅРёСЏ)
                     NumbErrorRowLocal(m + 1) = Inf;
-                    Fail{i} = Fail{i} + 1; %Приращение счётчика ошибок
+                    Fail{i} = Fail{i} + 1; %РџСЂРёСЂР°С‰РµРЅРёРµ СЃС‡С‘С‚С‡РёРєР° РѕС€РёР±РѕРє
                 end
             end
-            if ~min(MinErrorLocal == Inf) %Если есть варинты склейки
-                %Поиск лучшего варианта
-                [MinErrorGlobal IndexErrorGlobal] = min(MinErrorLocal); %Минимум из варианта решений
-                NumbErrorRowGlobal = NumbErrorRowLocal(IndexErrorGlobal); %Строка с правой оптимальной точкой
-                RightIndex = ErrorComplex{IndexErrorGlobal}(NumbErrorRowGlobal,1) + 1; %Точка следующая за оптимальной
-                LeftIndex = size(PartsSignalGlued{i},1) - IndexErrorGlobal + 1; %Индекс среза левого фрагмента
-                %Усечение последнего фрагмента по лучшему варианту
-                PartsSignalGlued{i} = PartsSignalGlued{i}(1:LeftIndex,:); %Ускорения
-                PartsSignalGlued{i}(LeftIndex,3) = 1; %Проставление конца фрагмента
-                PartsSignalDerivativeGlued{i} = PartsSignalDerivativeGlued{i}(1:LeftIndex,:); %Производные
-                PartsSignalDerivativeGlued{i}(LeftIndex,3) = 1; %Проставление конца фрагмента
-                %Присоединение новых частей
-                PartsSignalGlued{i} = [PartsSignalGlued{i}; FixPartsSignal{i}(RightIndex:IndexPartsSignal{i}(j),:)]; %Склейка фрагментов ускорений
-                PartsSignalDerivativeGlued{i} = [PartsSignalDerivativeGlued{i}; PartsSignalDerivative{i}(RightIndex:IndexPartsSignal{i}(j),:)]; %Склейка фрагментов производных от ускорений
+            if ~min(MinErrorLocal == Inf) %Р•СЃР»Рё РµСЃС‚СЊ РІР°СЂРёРЅС‚С‹ СЃРєР»РµР№РєРё
+                %РџРѕРёСЃРє Р»СѓС‡С€РµРіРѕ РІР°СЂРёР°РЅС‚Р°
+                [MinErrorGlobal IndexErrorGlobal] = min(MinErrorLocal); %РњРёРЅРёРјСѓРј РёР· РІР°СЂРёР°РЅС‚Р° СЂРµС€РµРЅРёР№
+                NumbErrorRowGlobal = NumbErrorRowLocal(IndexErrorGlobal); %РЎС‚СЂРѕРєР° СЃ РїСЂР°РІРѕР№ РѕРїС‚РёРјР°Р»СЊРЅРѕР№ С‚РѕС‡РєРѕР№
+                RightIndex = ErrorComplex{IndexErrorGlobal}(NumbErrorRowGlobal,1) + 1; %РўРѕС‡РєР° СЃР»РµРґСѓСЋС‰Р°СЏ Р·Р° РѕРїС‚РёРјР°Р»СЊРЅРѕР№
+                LeftIndex = size(PartsSignalGlued{i},1) - IndexErrorGlobal + 1; %РРЅРґРµРєСЃ СЃСЂРµР·Р° Р»РµРІРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+                %РЈСЃРµС‡РµРЅРёРµ РїРѕСЃР»РµРґРЅРµРіРѕ С„СЂР°РіРјРµРЅС‚Р° РїРѕ Р»СѓС‡С€РµРјСѓ РІР°СЂРёР°РЅС‚Сѓ
+                PartsSignalGlued{i} = PartsSignalGlued{i}(1:LeftIndex,:); %РЈСЃРєРѕСЂРµРЅРёСЏ
+                PartsSignalGlued{i}(LeftIndex,3) = 1; %РџСЂРѕСЃС‚Р°РІР»РµРЅРёРµ РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
+                PartsSignalDerivativeGlued{i} = PartsSignalDerivativeGlued{i}(1:LeftIndex,:); %РџСЂРѕРёР·РІРѕРґРЅС‹Рµ
+                PartsSignalDerivativeGlued{i}(LeftIndex,3) = 1; %РџСЂРѕСЃС‚Р°РІР»РµРЅРёРµ РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
+                %РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ РЅРѕРІС‹С… С‡Р°СЃС‚РµР№
+                PartsSignalGlued{i} = [PartsSignalGlued{i}; FixPartsSignal{i}(RightIndex:IndexPartsSignal{i}(j),:)]; %РЎРєР»РµР№РєР° С„СЂР°РіРјРµРЅС‚РѕРІ СѓСЃРєРѕСЂРµРЅРёР№
+                PartsSignalDerivativeGlued{i} = [PartsSignalDerivativeGlued{i}; PartsSignalDerivative{i}(RightIndex:IndexPartsSignal{i}(j),:)]; %РЎРєР»РµР№РєР° С„СЂР°РіРјРµРЅС‚РѕРІ РїСЂРѕРёР·РІРѕРґРЅС‹С… РѕС‚ СѓСЃРєРѕСЂРµРЅРёР№
             end
-            SaveIndex = IndexPartsSignal{i}(j); %Запись индекса конца фрагмента
+            SaveIndex = IndexPartsSignal{i}(j); %Р—Р°РїРёСЃСЊ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
         end
     end
-%PartsSignalGlued{i}(:,2) = PartsSignalGlued{i}(:,2) - PartsSignalGlued{i}(1,2); %Отнулевое смещение после склейки
+%PartsSignalGlued{i}(:,2) = PartsSignalGlued{i}(:,2) - PartsSignalGlued{i}(1,2); %РћС‚РЅСѓР»РµРІРѕРµ СЃРјРµС‰РµРЅРёРµ РїРѕСЃР»Рµ СЃРєР»РµР№РєРё
 end
 
 end

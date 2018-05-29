@@ -1,23 +1,23 @@
 function  [PartsSignal IndexPartsSignal] = AssignLevels(Time, Signal, LineLevels)
-%Âûäåëåíèå ÷àñòåé ñèãíàëà ïî óðîâíÿìè
+%Ð’Ñ‹Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ Ñ‡Ð°ÑÑ‚ÐµÐ¹ ÑÐ¸Ð³Ð½Ð°Ð»Ð° Ð¿Ð¾ ÑƒÑ€Ð¾Ð²Ð½ÑÐ¼Ð¸
 
-LevelsNumb = size(LineLevels, 1); %×èñëî óðîâíåé
-for i = 1:LevelsNumb %Öèêë ïî ÷èñëó óðîâíåé
-    k = 1; %Çíà÷åíèå èíêðåìåíòà 
-    for j = 1:length(Signal) %Öèêë ïî çíà÷åíèÿì ñèãíàëà
-        if Signal(j) >= LineLevels(i,1) && Signal(j) <= LineLevels(i,2) %Îöåíêà âõîæäåíèÿ â óðîâåíü
-            PartsSignal{i}(k,1) = Time(j); %Çàïèñü âðåìåíè 
-            PartsSignal{i}(k,2) = Signal(j); %Çàïèñü ñèãíàëà
-            if j ~= length(Signal) %Åñëè êîíåö íå äîñòèãíóò
-               if ~(Signal(j+1) >= LineLevels(i,1) && Signal(j+1) <= LineLevels(i,2)) %Ïðîâåðêà êîíöà ôðàãìåíòà
-                   PartsSignal{i}(k,3) = 1; %Èäåíòèôèêàòîð êîíöà ôðàãìåíòà
+LevelsNumb = size(LineLevels, 1); %Ð§Ð¸ÑÐ»Ð¾ ÑƒÑ€Ð¾Ð²Ð½ÐµÐ¹
+for i = 1:LevelsNumb %Ð¦Ð¸ÐºÐ» Ð¿Ð¾ Ñ‡Ð¸ÑÐ»Ñƒ ÑƒÑ€Ð¾Ð²Ð½ÐµÐ¹
+    k = 1; %Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¸Ð½ÐºÑ€ÐµÐ¼ÐµÐ½Ñ‚Ð° 
+    for j = 1:length(Signal) %Ð¦Ð¸ÐºÐ» Ð¿Ð¾ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸ÑÐ¼ ÑÐ¸Ð³Ð½Ð°Ð»Ð°
+        if Signal(j) >= LineLevels(i,1) && Signal(j) <= LineLevels(i,2) %ÐžÑ†ÐµÐ½ÐºÐ° Ð²Ñ…Ð¾Ð¶Ð´ÐµÐ½Ð¸Ñ Ð² ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ
+            PartsSignal{i}(k,1) = Time(j); %Ð—Ð°Ð¿Ð¸ÑÑŒ Ð²Ñ€ÐµÐ¼ÐµÐ½Ð¸ 
+            PartsSignal{i}(k,2) = Signal(j); %Ð—Ð°Ð¿Ð¸ÑÑŒ ÑÐ¸Ð³Ð½Ð°Ð»Ð°
+            if j ~= length(Signal) %Ð•ÑÐ»Ð¸ ÐºÐ¾Ð½ÐµÑ† Ð½Ðµ Ð´Ð¾ÑÑ‚Ð¸Ð³Ð½ÑƒÑ‚
+               if ~(Signal(j+1) >= LineLevels(i,1) && Signal(j+1) <= LineLevels(i,2)) %ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° ÐºÐ¾Ð½Ñ†Ð° Ñ„Ñ€Ð°Ð³Ð¼ÐµÐ½Ñ‚Ð°
+                   PartsSignal{i}(k,3) = 1; %Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ ÐºÐ¾Ð½Ñ†Ð° Ñ„Ñ€Ð°Ð³Ð¼ÐµÐ½Ñ‚Ð°
                end
             end
-            k = k + 1; %Ïðèðàùåíèå èíêðåìåíòà íîìåðà ñòðîêè
+            k = k + 1; %ÐŸÑ€Ð¸Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ðµ Ð¸Ð½ÐºÑ€ÐµÐ¼ÐµÐ½Ñ‚Ð° Ð½Ð¾Ð¼ÐµÑ€Ð° ÑÑ‚Ñ€Ð¾ÐºÐ¸
         end
     end
-    PartsSignal{i}(end,3) = 1; %Ïðîñòàâëåíèå èíäåêñà êîíöà ïîñëåäíåãî ôðàãìåíòà 
-    IndexPartsSignal{i} = find(PartsSignal{i}(:,3) == 1); %Ïîëó÷åíèå èíäåêñîâ êîíöîâ ôðàãìåíòîâ
+    PartsSignal{i}(end,3) = 1; %ÐŸÑ€Ð¾ÑÑ‚Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð½Ð´ÐµÐºÑÐ° ÐºÐ¾Ð½Ñ†Ð° Ð¿Ð¾ÑÐ»ÐµÐ´Ð½ÐµÐ³Ð¾ Ñ„Ñ€Ð°Ð³Ð¼ÐµÐ½Ñ‚Ð° 
+    IndexPartsSignal{i} = find(PartsSignal{i}(:,3) == 1); %ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð¸Ð½Ð´ÐµÐºÑÐ¾Ð² ÐºÐ¾Ð½Ñ†Ð¾Ð² Ñ„Ñ€Ð°Ð³Ð¼ÐµÐ½Ñ‚Ð¾Ð²
 end
     
 end

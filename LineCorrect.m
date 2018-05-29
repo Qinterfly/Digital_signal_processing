@@ -1,8 +1,8 @@
 function FunCorrect = LineCorrect(Arg, Fun)
-%Линейная корректировка сигнала
+%Р›РёРЅРµР№РЅР°СЏ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° СЃРёРіРЅР°Р»Р°
 
-LowFrequencyLine = (Fun(end) - Fun(1)).*(Arg - Arg(1))./(Arg(end) - Arg(1)) + Fun(1); %Прямая, соединяющая концы сигнала
-FunCorrect = Fun - LowFrequencyLine; %Вычитание низкочастотной части
+LowFrequencyLine = (Fun(end) - Fun(1)).*(Arg - Arg(1))./(Arg(end) - Arg(1)) + Fun(1); %РџСЂСЏРјР°СЏ, СЃРѕРµРґРёРЅСЏСЋС‰Р°СЏ РєРѕРЅС†С‹ СЃРёРіРЅР°Р»Р°
+FunCorrect = Fun - LowFrequencyLine; %Р’С‹С‡РёС‚Р°РЅРёРµ РЅРёР·РєРѕС‡Р°СЃС‚РѕС‚РЅРѕР№ С‡Р°СЃС‚Рё
 
 end
 

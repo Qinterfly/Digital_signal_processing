@@ -1,50 +1,54 @@
 function [PartsMonotoneAccel, IndexMonotoneAccel] = ConstructMonotoneLevels(PartsAccel, PartsDisplacement, LineLevels)
-%Выделение монотонных частей в уровнях 
+%Р’С‹РґРµР»РµРЅРёРµ РјРѕРЅРѕС‚РѕРЅРЅС‹С… С‡Р°СЃС‚РµР№ РІ СѓСЂРѕРІРЅСЏС… 
 %(Signal->Levels(Increase, Neutral, Decrease)
 
-MaxLengthParts = [0, 0, 0]; %Инициализация массива наибольших длин по всем уровням
-for i = 1:size(LineLevels,1) %По всем уровням
-    IndexParts = find(PartsAccel{i}(:,3) == 1); %Получение индексов концов фрагментов
-    Boundary = abs(LineLevels(i,2) - LineLevels(i,1)) * 0.05; %Максимальная величина расхождения границ (5% длины)
-    for s = 1:3 %Обнуление сигналов : [Increase, Neutral, Decrease]
+MaxLengthParts = [0, 0, 0]; %РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјР°СЃСЃРёРІР° РЅР°РёР±РѕР»СЊС€РёС… РґР»РёРЅ РїРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
+for i = 1:size(LineLevels,1) %РџРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
+    IndexParts = find(PartsAccel{i}(:,3) == 1); %РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃРѕРІ РєРѕРЅС†РѕРІ С„СЂР°РіРјРµРЅС‚РѕРІ
+    Boundary = abs(LineLevels(i,2) - LineLevels(i,1)) * 0.05; %РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РІРµР»РёС‡РёРЅР° СЂР°СЃС…РѕР¶РґРµРЅРёСЏ РіСЂР°РЅРёС† (5% РґР»РёРЅС‹)
+    for s = 1:3 %РћР±РЅСѓР»РµРЅРёРµ СЃРёРіРЅР°Р»РѕРІ : [Increase, Neutral, Decrease]
         PartsMonotoneAccel{s}{i} = [];
     end
-    SaveIndex = 1; %Индекс конца фрагмента
+    SaveIndex = 1; %РРЅРґРµРєСЃ РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
     for j = 1:length(IndexParts)
-        Difference = PartsDisplacement{i}(IndexParts(j),2) - PartsDisplacement{i}(SaveIndex,2); %Запись разницы границ
-        FlagMonotone = 0; %Флаг переключение записи 
-        if abs(Difference) > Boundary %Проверка превышение погрешности
-            %Возрастающие
+        Difference = PartsDisplacement{i}(IndexParts(j),2) - PartsDisplacement{i}(SaveIndex,2); %Р—Р°РїРёСЃСЊ СЂР°Р·РЅРёС†С‹ РіСЂР°РЅРёС†
+        FlagMonotone = 0; %Р¤Р»Р°Рі РїРµСЂРµРєР»СЋС‡РµРЅРёРµ Р·Р°РїРёСЃРё 
+        if abs(Difference) > Boundary %РџСЂРѕРІРµСЂРєР° РїСЂРµРІС‹С€РµРЅРёРµ РїРѕРіСЂРµС€РЅРѕСЃС‚Рё
+            %Р’РѕР·СЂР°СЃС‚Р°СЋС‰РёРµ
             if Difference > 0
                 FlagMonotone = 1;
             end
-            %Убывающие
+            %РЈР±С‹РІР°СЋС‰РёРµ
             if Difference < 0
                 FlagMonotone = 3;
             end
-        %Нейтральные
+        %РќРµР№С‚СЂР°Р»СЊРЅС‹Рµ
         else
             FlagMonotone = 2;
         end
-            %Запись матрицы по флагу
+            %Р—Р°РїРёСЃСЊ РјР°С‚СЂРёС†С‹ РїРѕ С„Р»Р°РіСѓ
         PartsMonotoneAccel{FlagMonotone}{i} = [PartsMonotoneAccel{FlagMonotone}{i}; PartsAccel{i}(SaveIndex:IndexParts(j),:)]; 
-        SaveIndex = IndexParts(j) + 1; %Приращение индекса следующего за концом фрагмента   
+        SaveIndex = IndexParts(j) + 1; %РџСЂРёСЂР°С‰РµРЅРёРµ РёРЅРґРµРєСЃР° СЃР»РµРґСѓСЋС‰РµРіРѕ Р·Р° РєРѕРЅС†РѕРј С„СЂР°РіРјРµРЅС‚Р°   
     end
-    %Нахождение длин монотонных фрагментов по уровню
+    %РќР°С…РѕР¶РґРµРЅРёРµ РґР»РёРЅ РјРѕРЅРѕС‚РѕРЅРЅС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ РїРѕ СѓСЂРѕРІРЅСЋ
     for s = 1:3 %[Increase, Neutral, Decrease]
         if MaxLengthParts(s) < length(PartsMonotoneAccel{s}{i})
             MaxLengthParts(s) = length(PartsMonotoneAccel{s}{i});
         end
     end
 end
-%Проверка + индексация 
+%РџСЂРѕРІРµСЂРєР° + РёРЅРґРµРєСЃР°С†РёСЏ 
 for i = 1:size(LineLevels,1)
     for s = 1:3
         if isempty(PartsMonotoneAccel{s}{i})
-            PartsMonotoneAccel{s}{i} = zeros(MaxLengthParts(s),3);
+            if MaxLengthParts(s) ~= 0
+                PartsMonotoneAccel{s}{i} = zeros(MaxLengthParts(s),3);
+            else
+                PartsMonotoneAccel{s}{i} = zeros(max(MaxLengthParts),3);
+            end
             PartsMonotoneAccel{s}{i}(end, 3) = 1;
-        end %Проверка записи
-        IndexMonotoneAccel{s}{i} = find(PartsMonotoneAccel{s}{i}(:,3) == 1); %Запись индексов
+        end %РџСЂРѕРІРµСЂРєР° Р·Р°РїРёСЃРё
+        IndexMonotoneAccel{s}{i} = find(PartsMonotoneAccel{s}{i}(:,3) == 1); %Р—Р°РїРёСЃСЊ РёРЅРґРµРєСЃРѕРІ
     end
     
 end

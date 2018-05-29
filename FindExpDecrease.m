@@ -1,180 +1,180 @@
 function [PartsSignalApproxSpline,TableDecrementVisualize,PartsExpSignal,IndexPartsExpSignal,Limits] = FindExpDecrease(Signal,LimExpLevel,AccuracyExp,FreqDecrement,SampleRate,ModelApprox)
-%Поиск экспонециального затухания в сигнале
-%Output: 1 - убывающие; 2 - нулевые; 
+%РџРѕРёСЃРє СЌРєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕРіРѕ Р·Р°С‚СѓС…Р°РЅРёСЏ РІ СЃРёРіРЅР°Р»Рµ
+%Output: 1 - СѓР±С‹РІР°СЋС‰РёРµ; 2 - РЅСѓР»РµРІС‹Рµ; 
 
-%Находим лимитирующее значение
+%РќР°С…РѕРґРёРј Р»РёРјРёС‚РёСЂСѓСЋС‰РµРµ Р·РЅР°С‡РµРЅРёРµ
 ExpLevel = max(abs(Signal))*LimExpLevel;
-Limits = [mean(Signal) - ExpLevel, mean(Signal) + ExpLevel]; %Пределы с учетом средней линии
-%Находим период, соответствующий анализируемой частоте
+Limits = [mean(Signal) - ExpLevel, mean(Signal) + ExpLevel]; %РџСЂРµРґРµР»С‹ СЃ СѓС‡РµС‚РѕРј СЃСЂРµРґРЅРµР№ Р»РёРЅРёРё
+%РќР°С…РѕРґРёРј РїРµСЂРёРѕРґ, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ Р°РЅР°Р»РёР·РёСЂСѓРµРјРѕР№ С‡Р°СЃС‚РѕС‚Рµ
 PeriodDecrement = floor(1/FreqDecrement*SampleRate/200);
 if PeriodDecrement == 0
-   error('Искомая частота не может быть обнаружена. Частоты дискретизации прибора недостаточно'); 
+   error('РСЃРєРѕРјР°СЏ С‡Р°СЃС‚РѕС‚Р° РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕР±РЅР°СЂСѓР¶РµРЅР°. Р§Р°СЃС‚РѕС‚С‹ РґРёСЃРєСЂРµС‚РёР·Р°С†РёРё РїСЂРёР±РѕСЂР° РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ'); 
 end
-%Ищем части сигнала по уровням
-IndUp = 1; IndDown = 1; IndNeutral = 1; %Счетчики убывающих фрагментов
+%РС‰РµРј С‡Р°СЃС‚Рё СЃРёРіРЅР°Р»Р° РїРѕ СѓСЂРѕРІРЅСЏРј
+IndUp = 1; IndDown = 1; IndNeutral = 1; %РЎС‡РµС‚С‡РёРєРё СѓР±С‹РІР°СЋС‰РёС… С„СЂР°РіРјРµРЅС‚РѕРІ
 for i = 1:length(Signal)
-    %Убывающие фрагменты выше оси
+    %РЈР±С‹РІР°СЋС‰РёРµ С„СЂР°РіРјРµРЅС‚С‹ РІС‹С€Рµ РѕСЃРё
     if Signal(i) >= Limits(2)
        PartsExpSignalTemp{1}(IndUp,:) = [i Signal(i) 0];
        IndUp = IndUp + 1;
     end
-    %Убывающие фрагменты ниже оси
+    %РЈР±С‹РІР°СЋС‰РёРµ С„СЂР°РіРјРµРЅС‚С‹ РЅРёР¶Рµ РѕСЃРё
     if Signal(i) <= Limits(1)
         PartsExpSignalTemp{3}(IndDown,:) = [i Signal(i) 0];
         IndDown = IndDown + 1;
     end
-    %Нейтральные фрагменты фрагменты
+    %РќРµР№С‚СЂР°Р»СЊРЅС‹Рµ С„СЂР°РіРјРµРЅС‚С‹ С„СЂР°РіРјРµРЅС‚С‹
     if Signal(i) >= Limits(1) && Signal(i) <= Limits(2)
         PartsExpSignalTemp{2}(IndNeutral,:) = [i Signal(i) 0];
         IndNeutral = IndNeutral + 1;
     end
 end
-    %Находим концы фрагментов 
-for s = [1 3] %Фрагменты выше и ниже оси
-    [ExpSignalApprox ExpSignalApproxDerivative] = ApproxSpline(PartsExpSignalTemp{s}(:,1),PartsExpSignalTemp{s}(:,1),PartsExpSignalTemp{s}(:,2),AccuracyExp,2); %Аппроксимация B-сплайнами
+    %РќР°С…РѕРґРёРј РєРѕРЅС†С‹ С„СЂР°РіРјРµРЅС‚РѕРІ 
+for s = [1 3] %Р¤СЂР°РіРјРµРЅС‚С‹ РІС‹С€Рµ Рё РЅРёР¶Рµ РѕСЃРё
+    [ExpSignalApprox ExpSignalApproxDerivative] = ApproxSpline(PartsExpSignalTemp{s}(:,1),PartsExpSignalTemp{s}(:,1),PartsExpSignalTemp{s}(:,2),AccuracyExp,2); %РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ B-СЃРїР»Р°Р№РЅР°РјРё
     k = 1;
     for i = 1:length(ExpSignalApproxDerivative) - 1
-        if ExpSignalApproxDerivative(i+1)*ExpSignalApproxDerivative(i) < 0 %Отыскание корня
-            IndexPartsExpSignalTemp{s}(k,1) = PartsExpSignalTemp{s}(i,1); %Запись корня в индекс конца фрагмента
-            k = k + 1; %Приращение счётчика
+        if ExpSignalApproxDerivative(i+1)*ExpSignalApproxDerivative(i) < 0 %РћС‚С‹СЃРєР°РЅРёРµ РєРѕСЂРЅСЏ
+            IndexPartsExpSignalTemp{s}(k,1) = PartsExpSignalTemp{s}(i,1); %Р—Р°РїРёСЃСЊ РєРѕСЂРЅСЏ РІ РёРЅРґРµРєСЃ РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
+            k = k + 1; %РџСЂРёСЂР°С‰РµРЅРёРµ СЃС‡С‘С‚С‡РёРєР°
         end
     end
-    IndexPartsExpSignalTemp{s}(1:2:length(IndexPartsExpSignalTemp{s})-1) = []; %Удаление левых границ (определены неточно)
-    %Проставление индексов концов фрагментов
+    IndexPartsExpSignalTemp{s}(1:2:length(IndexPartsExpSignalTemp{s})-1) = []; %РЈРґР°Р»РµРЅРёРµ Р»РµРІС‹С… РіСЂР°РЅРёС† (РѕРїСЂРµРґРµР»РµРЅС‹ РЅРµС‚РѕС‡РЅРѕ)
+    %РџСЂРѕСЃС‚Р°РІР»РµРЅРёРµ РёРЅРґРµРєСЃРѕРІ РєРѕРЅС†РѕРІ С„СЂР°РіРјРµРЅС‚РѕРІ
     k = 1;
     for i = 1:length(IndexPartsExpSignalTemp{s})
         for j = 1:length(PartsExpSignalTemp{s})
             if PartsExpSignalTemp{s}(j,1) == IndexPartsExpSignalTemp{s}(i)
-                PartsExpSignalTemp{s}(j,3) = 1; %Конец фрагмента
+                PartsExpSignalTemp{s}(j,3) = 1; %РљРѕРЅРµС† С„СЂР°РіРјРµРЅС‚Р°
                 IndexPartsSignalApproxSpline{s}(k,1) = j;
                 k = k + 1;
                 break
             end
         end
     end
-    %Выделение частичных сплайнов для каждого пика
-    SaveIndex = 0; %Начальное значение индекса конца предыдущего фрагмента
+    %Р’С‹РґРµР»РµРЅРёРµ С‡Р°СЃС‚РёС‡РЅС‹С… СЃРїР»Р°Р№РЅРѕРІ РґР»СЏ РєР°Р¶РґРѕРіРѕ РїРёРєР°
+    SaveIndex = 0; %РќР°С‡Р°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
     PartsSignalApproxSpline{s} = [];
-    for i = 1:length(IndexPartsSignalApproxSpline{s}) %Нахождение всех частичных сплайнов
-        Xdata = PartsExpSignalTemp{s}(SaveIndex + 1:IndexPartsSignalApproxSpline{s}(i),1); %Значения для аппроксимации
+    for i = 1:length(IndexPartsSignalApproxSpline{s}) %РќР°С…РѕР¶РґРµРЅРёРµ РІСЃРµС… С‡Р°СЃС‚РёС‡РЅС‹С… СЃРїР»Р°Р№РЅРѕРІ
+        Xdata = PartsExpSignalTemp{s}(SaveIndex + 1:IndexPartsSignalApproxSpline{s}(i),1); %Р—РЅР°С‡РµРЅРёСЏ РґР»СЏ Р°РїРїСЂРѕРєСЃРёРјР°С†РёРё
         Ydata = PartsExpSignalTemp{s}(SaveIndex + 1:IndexPartsSignalApproxSpline{s}(i),2);
         try
-            switch ModelApprox %Модель аппроксимации затухания
+            switch ModelApprox %РњРѕРґРµР»СЊ Р°РїРїСЂРѕРєСЃРёРјР°С†РёРё Р·Р°С‚СѓС…Р°РЅРёСЏ
                 case 'B-Spline'
-                    [ResultTemp, ~] = ApproxSpline(Xdata,Xdata,Ydata,AccuracyExp,0); %Аппроксимация B-сплайнами
+                    [ResultTemp, ~] = ApproxSpline(Xdata,Xdata,Ydata,AccuracyExp,0); %РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ B-СЃРїР»Р°Р№РЅР°РјРё
                 case 'Exponential'
                     FitModel = fittype('exp2');
-                    FitFun = fit(Xdata,Ydata,FitModel); %Построение модели
-                    ResultTemp = feval(FitFun,Xdata); %Расчёт результатов на заданной сетке
+                    FitFun = fit(Xdata,Ydata,FitModel); %РџРѕСЃС‚СЂРѕРµРЅРёРµ РјРѕРґРµР»Рё
+                    ResultTemp = feval(FitFun,Xdata); %Р Р°СЃС‡С‘С‚ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РЅР° Р·Р°РґР°РЅРЅРѕР№ СЃРµС‚РєРµ
                 case 'Rational'
                     FitModel = fittype('rat23');
-                    FitFun = fit(Xdata,Ydata,FitModel); %Построение модели
-                    ResultTemp = feval(FitFun,Xdata); %Расчёт результатов на заданной сетке
+                    FitFun = fit(Xdata,Ydata,FitModel); %РџРѕСЃС‚СЂРѕРµРЅРёРµ РјРѕРґРµР»Рё
+                    ResultTemp = feval(FitFun,Xdata); %Р Р°СЃС‡С‘С‚ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РЅР° Р·Р°РґР°РЅРЅРѕР№ СЃРµС‚РєРµ
                 case 'Power'
                     FitModel = fittype('power2');
-                    FitFun = fit(Xdata,Ydata,FitModel); %Построение модели
-                    ResultTemp = feval(FitFun,Xdata); %Расчёт результатов на заданной сетке
+                    FitFun = fit(Xdata,Ydata,FitModel); %РџРѕСЃС‚СЂРѕРµРЅРёРµ РјРѕРґРµР»Рё
+                    ResultTemp = feval(FitFun,Xdata); %Р Р°СЃС‡С‘С‚ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РЅР° Р·Р°РґР°РЅРЅРѕР№ СЃРµС‚РєРµ
             end
-        catch %Если точек для аппроксимации недостаточно
+        catch %Р•СЃР»Рё С‚РѕС‡РµРє РґР»СЏ Р°РїРїСЂРѕРєСЃРёРјР°С†РёРё РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ
             ResultTemp = zeros(length(Xdata),1);
         end
-        ResultTemp = [PartsExpSignalTemp{s}(SaveIndex + 1:IndexPartsSignalApproxSpline{s}(i),1),ResultTemp]; %Время для частичных сплайнов
-        ResultTemp(:,3) = PartsExpSignalTemp{s}(SaveIndex + 1:IndexPartsSignalApproxSpline{s}(i),3); %Концы фрагментов для частичных сплайнов
+        ResultTemp = [PartsExpSignalTemp{s}(SaveIndex + 1:IndexPartsSignalApproxSpline{s}(i),1),ResultTemp]; %Р’СЂРµРјСЏ РґР»СЏ С‡Р°СЃС‚РёС‡РЅС‹С… СЃРїР»Р°Р№РЅРѕРІ
+        ResultTemp(:,3) = PartsExpSignalTemp{s}(SaveIndex + 1:IndexPartsSignalApproxSpline{s}(i),3); %РљРѕРЅС†С‹ С„СЂР°РіРјРµРЅС‚РѕРІ РґР»СЏ С‡Р°СЃС‚РёС‡РЅС‹С… СЃРїР»Р°Р№РЅРѕРІ
         PartsSignalApproxSpline{s} = [PartsSignalApproxSpline{s}; ResultTemp];
         SaveIndex = IndexPartsSignalApproxSpline{s}(i);
     end
-    SaveIndex = 0; %Начальное значение индекса конца предыдущего фрагмента
-    for i = 1:length(IndexPartsSignalApproxSpline{s}) %Выделение декрементов
-        LengthFragment = length(PartsSignalApproxSpline{s}(SaveIndex + 1:IndexPartsSignalApproxSpline{s}(i),1)); %Длина текущего фрагмента
-        NumbPeriodDecrement = floor((LengthFragment - 1)/PeriodDecrement); %Число периодов, соответствующее заданной частоте в данном фрагменте
-        Decrement{i} = []; %Инициализация переменной
+    SaveIndex = 0; %РќР°С‡Р°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+    for i = 1:length(IndexPartsSignalApproxSpline{s}) %Р’С‹РґРµР»РµРЅРёРµ РґРµРєСЂРµРјРµРЅС‚РѕРІ
+        LengthFragment = length(PartsSignalApproxSpline{s}(SaveIndex + 1:IndexPartsSignalApproxSpline{s}(i),1)); %Р”Р»РёРЅР° С‚РµРєСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+        NumbPeriodDecrement = floor((LengthFragment - 1)/PeriodDecrement); %Р§РёСЃР»Рѕ РїРµСЂРёРѕРґРѕРІ, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРµ Р·Р°РґР°РЅРЅРѕР№ С‡Р°СЃС‚РѕС‚Рµ РІ РґР°РЅРЅРѕРј С„СЂР°РіРјРµРЅС‚Рµ
+        Decrement{i} = []; %РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
         if NumbPeriodDecrement ~= 0
-            TempIndexStart = SaveIndex + 1; %Начало периода
+            TempIndexStart = SaveIndex + 1; %РќР°С‡Р°Р»Рѕ РїРµСЂРёРѕРґР°
             for j = 1:NumbPeriodDecrement
-                TempIndexEnd = TempIndexStart + PeriodDecrement; %Конец периода
-                Decrement{i}(j) = abs(PartsSignalApproxSpline{s}(TempIndexStart,2)/PartsSignalApproxSpline{s}(TempIndexEnd,2)); %Вычисление декремента затуханий
+                TempIndexEnd = TempIndexStart + PeriodDecrement; %РљРѕРЅРµС† РїРµСЂРёРѕРґР°
+                Decrement{i}(j) = abs(PartsSignalApproxSpline{s}(TempIndexStart,2)/PartsSignalApproxSpline{s}(TempIndexEnd,2)); %Р’С‹С‡РёСЃР»РµРЅРёРµ РґРµРєСЂРµРјРµРЅС‚Р° Р·Р°С‚СѓС…Р°РЅРёР№
                 TempIndexStart = TempIndexEnd;
             end
         end
         if isempty(Decrement{i})
-            Decrement{i} = 0; %Зануление в случае короткого фрагмента
+            Decrement{i} = 0; %Р—Р°РЅСѓР»РµРЅРёРµ РІ СЃР»СѓС‡Р°Рµ РєРѕСЂРѕС‚РєРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
         end
         SaveIndex = IndexPartsSignalApproxSpline{s}(i);
     end 
-    TableDecrementVisualize{s} = CreateTableVisualize(Decrement); %Cоздание таблицу для визуализации декрементов по пикам (1 - верх, 3 - низ)
+    TableDecrementVisualize{s} = CreateTableVisualize(Decrement); %CРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†Сѓ РґР»СЏ РІРёР·СѓР°Р»РёР·Р°С†РёРё РґРµРєСЂРµРјРµРЅС‚РѕРІ РїРѕ РїРёРєР°Рј (1 - РІРµСЂС…, 3 - РЅРёР·)
 end
 
-%Нивелирование погрешности выбора
+%РќРёРІРµР»РёСЂРѕРІР°РЅРёРµ РїРѕРіСЂРµС€РЅРѕСЃС‚Рё РІС‹Р±РѕСЂР°
 if length(IndexPartsExpSignalTemp{1}) <= length(IndexPartsExpSignalTemp{3})
     IndexPartsExpSignalFull = IndexPartsExpSignalTemp{1};
 else
     IndexPartsExpSignalFull = IndexPartsExpSignalTemp{3};
 end
-%Отыскание левых границ
+%РћС‚С‹СЃРєР°РЅРёРµ Р»РµРІС‹С… РіСЂР°РЅРёС†
 IndexPartsExpSignalFull = [PartsExpSignalTemp{1}(1,1);IndexPartsExpSignalFull];
 k = 1; j = 1;
-for i = 1:length(IndexPartsExpSignalFull) %Цикл по правым границам
+for i = 1:length(IndexPartsExpSignalFull) %Р¦РёРєР» РїРѕ РїСЂР°РІС‹Рј РіСЂР°РЅРёС†Р°Рј
     while 1
-        if PartsExpSignalTemp{1}(j,1) > IndexPartsExpSignalFull(i) %Сравнение с текущей правой границей
-            LeftExpIndexTemp(k,1) = PartsExpSignalTemp{1}(j,1); %Запись левой границы
+        if PartsExpSignalTemp{1}(j,1) > IndexPartsExpSignalFull(i) %РЎСЂР°РІРЅРµРЅРёРµ СЃ С‚РµРєСѓС‰РµР№ РїСЂР°РІРѕР№ РіСЂР°РЅРёС†РµР№
+            LeftExpIndexTemp(k,1) = PartsExpSignalTemp{1}(j,1); %Р—Р°РїРёСЃСЊ Р»РµРІРѕР№ РіСЂР°РЅРёС†С‹
             k = k + 1; 
             break
         end
         j = j + 1;
     end
 end
-LeftExpIndexTemp(1) = []; %Обнуляем первое приближение
-IndexPartsExpSignalFull = sort([LeftExpIndexTemp;IndexPartsExpSignalFull]); %Левая + правая граница
-IndexPartsExpSignalFull(end + 1) = PartsExpSignalTemp{1}(end,1); %Добавляем правую границу последнего фрагмента
-%Корректируем угловые значения
-IndexPartsExpSignalFull(end + 1) = length(Signal); %Правая граница ускорений
-IndexPartsExpSignalFull = [1;IndexPartsExpSignalFull]; %Левая граница ускорений
-    %Собирание нейтральных фрагментов
+LeftExpIndexTemp(1) = []; %РћР±РЅСѓР»СЏРµРј РїРµСЂРІРѕРµ РїСЂРёР±Р»РёР¶РµРЅРёРµ
+IndexPartsExpSignalFull = sort([LeftExpIndexTemp;IndexPartsExpSignalFull]); %Р›РµРІР°СЏ + РїСЂР°РІР°СЏ РіСЂР°РЅРёС†Р°
+IndexPartsExpSignalFull(end + 1) = PartsExpSignalTemp{1}(end,1); %Р”РѕР±Р°РІР»СЏРµРј РїСЂР°РІСѓСЋ РіСЂР°РЅРёС†Сѓ РїРѕСЃР»РµРґРЅРµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+%РљРѕСЂСЂРµРєС‚РёСЂСѓРµРј СѓРіР»РѕРІС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
+IndexPartsExpSignalFull(end + 1) = length(Signal); %РџСЂР°РІР°СЏ РіСЂР°РЅРёС†Р° СѓСЃРєРѕСЂРµРЅРёР№
+IndexPartsExpSignalFull = [1;IndexPartsExpSignalFull]; %Р›РµРІР°СЏ РіСЂР°РЅРёС†Р° СѓСЃРєРѕСЂРµРЅРёР№
+    %РЎРѕР±РёСЂР°РЅРёРµ РЅРµР№С‚СЂР°Р»СЊРЅС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
 k = 1;
-for i = 1:2:length(IndexPartsExpSignalFull) - 1 %Цикл по нечетным номерам
+for i = 1:2:length(IndexPartsExpSignalFull) - 1 %Р¦РёРєР» РїРѕ РЅРµС‡РµС‚РЅС‹Рј РЅРѕРјРµСЂР°Рј
     for j = 1:length(Signal)
-        if j >= IndexPartsExpSignalFull(i) && j < IndexPartsExpSignalFull(i + 1) %Проверка попадания в отрезок
+        if j >= IndexPartsExpSignalFull(i) && j < IndexPartsExpSignalFull(i + 1) %РџСЂРѕРІРµСЂРєР° РїРѕРїР°РґР°РЅРёСЏ РІ РѕС‚СЂРµР·РѕРє
             PartsExpSignal{2}(k,:) = [j Signal(j) 0]; 
-            if j == IndexPartsExpSignalFull(i + 1)-1 %Для правой границы
-                PartsExpSignal{2}(k,3) = 1; %Идентификатор конца фрагмента
+            if j == IndexPartsExpSignalFull(i + 1)-1 %Р”Р»СЏ РїСЂР°РІРѕР№ РіСЂР°РЅРёС†С‹
+                PartsExpSignal{2}(k,3) = 1; %РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
             end
             k = k + 1;
         end
     end
 end
-    %Собирание убывающих фрагментов
+    %РЎРѕР±РёСЂР°РЅРёРµ СѓР±С‹РІР°СЋС‰РёС… С„СЂР°РіРјРµРЅС‚РѕРІ
 k = 1;
-for i = 2:2:length(IndexPartsExpSignalFull) - 2 %Цикл по четным номерам
+for i = 2:2:length(IndexPartsExpSignalFull) - 2 %Р¦РёРєР» РїРѕ С‡РµС‚РЅС‹Рј РЅРѕРјРµСЂР°Рј
     for j = 1:length(Signal)
-        if j >= IndexPartsExpSignalFull(i) && j <= IndexPartsExpSignalFull(i + 1) %Проверка попадания в отрезок
+        if j >= IndexPartsExpSignalFull(i) && j <= IndexPartsExpSignalFull(i + 1) %РџСЂРѕРІРµСЂРєР° РїРѕРїР°РґР°РЅРёСЏ РІ РѕС‚СЂРµР·РѕРє
             PartsExpSignal{1}(k,:) = [j Signal(j) 0];
-            if j == IndexPartsExpSignalFull(i + 1) %Для правой границы
-                PartsExpSignal{1}(k,3) = 1; %Идентификатор конца фрагмента
+            if j == IndexPartsExpSignalFull(i + 1) %Р”Р»СЏ РїСЂР°РІРѕР№ РіСЂР°РЅРёС†С‹
+                PartsExpSignal{1}(k,3) = 1; %РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
             end
-            k = k + 1; %Приращение счетчика
+            k = k + 1; %РџСЂРёСЂР°С‰РµРЅРёРµ СЃС‡РµС‚С‡РёРєР°
         end
     end
 end
-    %Получение индексов фрагментов для каждого уровня
-IndexPartsExpSignal{1} = find(PartsExpSignal{1}(:,3) == 1); %Отыскание концов убывающих фрагментов
-IndexPartsExpSignal{2} = find(PartsExpSignal{2}(:,3) == 1); %Отысканые концов нулевых фрагментов
+    %РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃРѕРІ С„СЂР°РіРјРµРЅС‚РѕРІ РґР»СЏ РєР°Р¶РґРѕРіРѕ СѓСЂРѕРІРЅСЏ
+IndexPartsExpSignal{1} = find(PartsExpSignal{1}(:,3) == 1); %РћС‚С‹СЃРєР°РЅРёРµ РєРѕРЅС†РѕРІ СѓР±С‹РІР°СЋС‰РёС… С„СЂР°РіРјРµРЅС‚РѕРІ
+IndexPartsExpSignal{2} = find(PartsExpSignal{2}(:,3) == 1); %РћС‚С‹СЃРєР°РЅС‹Рµ РєРѕРЅС†РѕРІ РЅСѓР»РµРІС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
 end
 
-function TableVisualize = CreateTableVisualize(Signal) %Создание единой таблицы для сравнения  
-    if ~iscell(Signal), error('Неверный формат ввода'), end %Провера ячеистой структуры
-    RowsTable = length(Signal); %Число пиков в сигнале
-    MaxLength = 0; %Начальное значение второго измерения
+function TableVisualize = CreateTableVisualize(Signal) %РЎРѕР·РґР°РЅРёРµ РµРґРёРЅРѕР№ С‚Р°Р±Р»РёС†С‹ РґР»СЏ СЃСЂР°РІРЅРµРЅРёСЏ  
+    if ~iscell(Signal), error('РќРµРІРµСЂРЅС‹Р№ С„РѕСЂРјР°С‚ РІРІРѕРґР°'), end %РџСЂРѕРІРµСЂР° СЏС‡РµРёСЃС‚РѕР№ СЃС‚СЂСѓРєС‚СѓСЂС‹
+    RowsTable = length(Signal); %Р§РёСЃР»Рѕ РїРёРєРѕРІ РІ СЃРёРіРЅР°Р»Рµ
+    MaxLength = 0; %РќР°С‡Р°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РІС‚РѕСЂРѕРіРѕ РёР·РјРµСЂРµРЅРёСЏ
     for i = 1:RowsTable
-        if length(Signal{i}) > MaxLength %Поиск максимальной длины фрагмента
+        if length(Signal{i}) > MaxLength %РџРѕРёСЃРє РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РґР»РёРЅС‹ С„СЂР°РіРјРµРЅС‚Р°
             MaxLength =  length(Signal{i});
         end
     end
     ColsTable = MaxLength;
-    TableVisualize = zeros(RowsTable,ColsTable); %Выделение памяти под таблицу для визуализции
-    %Занесение данных в таблицу
-    for i = 1:RowsTable %По каждому пику
+    TableVisualize = zeros(RowsTable,ColsTable); %Р’С‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РїРѕРґ С‚Р°Р±Р»РёС†Сѓ РґР»СЏ РІРёР·СѓР°Р»РёР·С†РёРё
+    %Р—Р°РЅРµСЃРµРЅРёРµ РґР°РЅРЅС‹С… РІ С‚Р°Р±Р»РёС†Сѓ
+    for i = 1:RowsTable %РџРѕ РєР°Р¶РґРѕРјСѓ РїРёРєСѓ
         for j = 1:length(Signal{i})
-            TableVisualize(i,j) = Signal{i}(j); %Поэлементная запись сигнала в строку
+            TableVisualize(i,j) = Signal{i}(j); %РџРѕСЌР»РµРјРµРЅС‚РЅР°СЏ Р·Р°РїРёСЃСЊ СЃРёРіРЅР°Р»Р° РІ СЃС‚СЂРѕРєСѓ
         end
     end
 end

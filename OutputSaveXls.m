@@ -1,41 +1,41 @@
 function OutputSaveXls(OutputSignal, TitleLevels, FileName, TechnicalData, Path, InputFileName)
-%Сохранение результатов спектрального расчёта в виде таблиц в .xls формате
-%одним вызовом COM сервера Excel
+%РЎРѕС…СЂР°РЅРµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ СЃРїРµРєС‚СЂР°Р»СЊРЅРѕРіРѕ СЂР°СЃС‡С‘С‚Р° РІ РІРёРґРµ С‚Р°Р±Р»РёС† РІ .xls С„РѕСЂРјР°С‚Рµ
+%РѕРґРЅРёРј РІС‹Р·РѕРІРѕРј COM СЃРµСЂРІРµСЂР° Excel
 
-%Запись пути сохранения
-Path = strcat(Path,'\Результаты\',InputFileName);
-if ~isdir(Path) %Создание директории для данного сигнала
+%Р—Р°РїРёСЃСЊ РїСѓС‚Рё СЃРѕС…СЂР°РЅРµРЅРёСЏ
+Path = strcat(Path,'\Р РµР·СѓР»СЊС‚Р°С‚С‹\',InputFileName);
+if ~isdir(Path) %РЎРѕР·РґР°РЅРёРµ РґРёСЂРµРєС‚РѕСЂРёРё РґР»СЏ РґР°РЅРЅРѕРіРѕ СЃРёРіРЅР°Р»Р°
    mkdir(Path);  
 end
-FullFileName = strcat(Path,'/',FileName,'.xls'); %Полное имя файла
-if exist(FullFileName) == 2 %Проверка существования файла
-   delete(FullFileName); %Удаление
+FullFileName = strcat(Path,'/',FileName,'.xls'); %РџРѕР»РЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+if exist(FullFileName) == 2 %РџСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»Р°
+   delete(FullFileName); %РЈРґР°Р»РµРЅРёРµ
 end
-SpreadSheet = 'Лист1'; %Название рабочей страницы страницы
-%Создание результрующей таблицы
-    %Технические сведения
+SpreadSheet = 'Р›РёСЃС‚1'; %РќР°Р·РІР°РЅРёРµ СЂР°Р±РѕС‡РµР№ СЃС‚СЂР°РЅРёС†С‹ СЃС‚СЂР°РЅРёС†С‹
+%РЎРѕР·РґР°РЅРёРµ СЂРµР·СѓР»СЊС‚СЂСѓСЋС‰РµР№ С‚Р°Р±Р»РёС†С‹
+    %РўРµС…РЅРёС‡РµСЃРєРёРµ СЃРІРµРґРµРЅРёСЏ
 for i = 1:length(TechnicalData)
     ResultTable{i,1} = (TechnicalData{i});
 end
-ResultTable{i + 1,1} = ''; %Отступ перед основными данными
-BeginBaseInd = i + 2; %Индекс начала основных данных
-    %Основные данные
+ResultTable{i + 1,1} = ''; %РћС‚СЃС‚СѓРї РїРµСЂРµРґ РѕСЃРЅРѕРІРЅС‹РјРё РґР°РЅРЅС‹РјРё
+BeginBaseInd = i + 2; %РРЅРґРµРєСЃ РЅР°С‡Р°Р»Р° РѕСЃРЅРѕРІРЅС‹С… РґР°РЅРЅС‹С…
+    %РћСЃРЅРѕРІРЅС‹Рµ РґР°РЅРЅС‹Рµ
 EndColInd = 1;
 for i = 1:length(OutputSignal)
     TempArrayToCell = '';
-    ResultTable{BeginBaseInd, EndColInd} = TitleLevels(i); %Номер столбца
+    ResultTable{BeginBaseInd, EndColInd} = TitleLevels(i); %РќРѕРјРµСЂ СЃС‚РѕР»Р±С†Р°
     if ~isempty(OutputSignal{i})
-        for m = 1:size(OutputSignal{i}, 1) %Цикл по строкам матрицы вывода
-            for n = 1:size(OutputSignal{i}, 2) %Цикл по столбцам матрицы вывода,
-                ResultTable{BeginBaseInd + m, EndColInd + n-1} = strrep(num2str(OutputSignal{i}(m, n)), '.', ','); %Запись сигнала уровня по столбцам с отступами в формате .xls
+        for m = 1:size(OutputSignal{i}, 1) %Р¦РёРєР» РїРѕ СЃС‚СЂРѕРєР°Рј РјР°С‚СЂРёС†С‹ РІС‹РІРѕРґР°
+            for n = 1:size(OutputSignal{i}, 2) %Р¦РёРєР» РїРѕ СЃС‚РѕР»Р±С†Р°Рј РјР°С‚СЂРёС†С‹ РІС‹РІРѕРґР°,
+                ResultTable{BeginBaseInd + m, EndColInd + n-1} = strrep(num2str(OutputSignal{i}(m, n)), '.', ','); %Р—Р°РїРёСЃСЊ СЃРёРіРЅР°Р»Р° СѓСЂРѕРІРЅСЏ РїРѕ СЃС‚РѕР»Р±С†Р°Рј СЃ РѕС‚СЃС‚СѓРїР°РјРё РІ С„РѕСЂРјР°С‚Рµ .xls
             end
         end
-        EndColInd = EndColInd + size(OutputSignal{i}, 2) + 1; %Приращение индекса последнего столбца
+        EndColInd = EndColInd + size(OutputSignal{i}, 2) + 1; %РџСЂРёСЂР°С‰РµРЅРёРµ РёРЅРґРµРєСЃР° РїРѕСЃР»РµРґРЅРµРіРѕ СЃС‚РѕР»Р±С†Р°
     else
         EndColInd = EndColInd + 2;
     end
 end
-xlswrite(FullFileName, ResultTable, SpreadSheet); %Сохранение таблицы
+xlswrite(FullFileName, ResultTable, SpreadSheet); %РЎРѕС…СЂР°РЅРµРЅРёРµ С‚Р°Р±Р»РёС†С‹
 
 end
 

@@ -1,11 +1,11 @@
 function [SignalApprox, SignalApproxDerivative] = ApproxSpline(TimeInput, TimeInterpolate, Signal, Accuracy, DerivativeDegree)
-%Аппроксимация функции B-сплайнами с заданной степенью сглаживания
+%РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ С„СѓРЅРєС†РёРё B-СЃРїР»Р°Р№РЅР°РјРё СЃ Р·Р°РґР°РЅРЅРѕР№ СЃС‚РµРїРµРЅСЊСЋ СЃРіР»Р°Р¶РёРІР°РЅРёСЏ
 
-SignalApproxCoeffs = csaps(TimeInput, Signal, Accuracy); %Коэффициенты аппроксимирующего B - сплайна
-SignalApprox = fnval(SignalApproxCoeffs, TimeInterpolate); %Вычисление значений функции для заданного дискретного набора точек
-if DerivativeDegree ~= 0 %Идентификатор вычисления производной
-    SignalApproxDerivativeCoeffs = fnder(SignalApproxCoeffs, DerivativeDegree); %Вычисление производной B - сплайна
-    SignalApproxDerivative = fnval(SignalApproxDerivativeCoeffs, TimeInterpolate); %Вычисление значений функции для заданног дискретного набора точек
+SignalApproxCoeffs = csaps(TimeInput, Signal, Accuracy); %РљРѕСЌС„С„РёС†РёРµРЅС‚С‹ Р°РїРїСЂРѕРєСЃРёРјРёСЂСѓСЋС‰РµРіРѕ B - СЃРїР»Р°Р№РЅР°
+SignalApprox = fnval(SignalApproxCoeffs, TimeInterpolate); %Р’С‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ С„СѓРЅРєС†РёРё РґР»СЏ Р·Р°РґР°РЅРЅРѕРіРѕ РґРёСЃРєСЂРµС‚РЅРѕРіРѕ РЅР°Р±РѕСЂР° С‚РѕС‡РµРє
+if DerivativeDegree ~= 0 %РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РІС‹С‡РёСЃР»РµРЅРёСЏ РїСЂРѕРёР·РІРѕРґРЅРѕР№
+    SignalApproxDerivativeCoeffs = fnder(SignalApproxCoeffs, DerivativeDegree); %Р’С‹С‡РёСЃР»РµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅРѕР№ B - СЃРїР»Р°Р№РЅР°
+    SignalApproxDerivative = fnval(SignalApproxDerivativeCoeffs, TimeInterpolate); %Р’С‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ С„СѓРЅРєС†РёРё РґР»СЏ Р·Р°РґР°РЅРЅРѕРі РґРёСЃРєСЂРµС‚РЅРѕРіРѕ РЅР°Р±РѕСЂР° С‚РѕС‡РµРє
 else
     SignalApproxDerivative = 0;    
 end

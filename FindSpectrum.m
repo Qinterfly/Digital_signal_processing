@@ -1,52 +1,54 @@
 function [SpectrumSignalVisualize Frequency] = FindSpectrum(PartsSignalGlued, SampleRate, LengthFFT, Mode, Accuracy) 
-%Выделение спектра и формирование массива для построения логорифмической поверхности поверхности
+%РћСЃСѓС‰РµСЃС‚РІР»РµРЅРёРµ СЃРїРµРєС‚СЂР°Р»СЊРЅРѕРіРѕ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ (Р¤СѓСЂСЊРµ РёР»Рё РЈСЌР»С‡Р°) Рё
+%РїСЂРµРїСЂРѕС†РµСЃСЃРёРЅРі РґР°РЅРЅС‹С… РїРµСЂРµРґ РїРѕСЃС‚СЂРѕРµРЅРёРµРј СЃРїРµРєС‚СЂР°Р»СЊРЅРѕР№ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё 
+%Mode = FFT || Welch
 
-%Проверка валидности исходных данных
+%РџСЂРѕРІРµСЂРєР° РІР°Р»РёРґРЅРѕСЃС‚Рё РёСЃС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…
 if ~iscell(PartsSignalGlued)
-    error('Неверный формат данных');
+    error('РќРµРІРµСЂРЅС‹Р№ С„РѕСЂРјР°С‚ РґР°РЅРЅС‹С…');
 end
-clear Temp; %Очистка промежуточной переменной
+clear Temp; %РћС‡РёСЃС‚РєР° РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 
-LevelsNumb = length(PartsSignalGlued); %Находим число уровней
-if LengthFFT == 0 %Поиск минимально возможной длины разложения
-    %Преобразование Фурье для склееных уровней сигнала
-    MinNFFT = 1e9; %Начальное оценочное значение
-    for i = 1:LevelsNumb %Цикл по всем уровням
-        L = size(PartsSignalGlued{i},1); %Длина уровня сигнала
-        NFFT = 2^nextpow2(L); %Длина БПФ
-        if NFFT < MinNFFT %Поиск минимальной длины БПФ в массиве
+LevelsNumb = length(PartsSignalGlued); %РќР°С…РѕРґРёРј С‡РёСЃР»Рѕ СѓСЂРѕРІРЅРµР№
+if LengthFFT == 0 %РџРѕРёСЃРє РјРёРЅРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅРѕР№ РґР»РёРЅС‹ СЂР°Р·Р»РѕР¶РµРЅРёСЏ
+    %РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Р¤СѓСЂСЊРµ РґР»СЏ СЃРєР»РµРµРЅС‹С… СѓСЂРѕРІРЅРµР№ СЃРёРіРЅР°Р»Р°
+    MinNFFT = 1e9; %РќР°С‡Р°Р»СЊРЅРѕРµ РѕС†РµРЅРѕС‡РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
+    for i = 1:LevelsNumb %Р¦РёРєР» РїРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
+        L = size(PartsSignalGlued{i},1); %Р”Р»РёРЅР° СѓСЂРѕРІРЅСЏ СЃРёРіРЅР°Р»Р°
+        NFFT = 2^nextpow2(L); %Р”Р»РёРЅР° Р‘РџР¤
+        if NFFT < MinNFFT %РџРѕРёСЃРє РјРёРЅРёРјР°Р»СЊРЅРѕР№ РґР»РёРЅС‹ Р‘РџР¤ РІ РјР°СЃСЃРёРІРµ
             MinNFFT = NFFT;
         end
     end
 else
-    MinNFFT = (LengthFFT - 1)*2; %Разложение в ряд Фурье по заданной длине
+    MinNFFT = (LengthFFT - 1)*2; %Р Р°Р·Р»РѕР¶РµРЅРёРµ РІ СЂСЏРґ Р¤СѓСЂСЊРµ РїРѕ Р·Р°РґР°РЅРЅРѕР№ РґР»РёРЅРµ
 end
 switch Mode
-    case 'FFT' %ДПФ
-        Frequency = SampleRate*(1:MinNFFT/2)/MinNFFT/100; %Физические частоты сигнала
-        for i = 1:LevelsNumb %Цикл по всем уровням
-            Y = fft(PartsSignalGlued{i}(:,2),MinNFFT); %Осуществляем БПФ
-            Y = Y(1:MinNFFT/2); %Отсекаем симметричную часть
-            P = abs(Y); %Находим амплитуду
-            SpectrumSignal{i} = P; %Массив амплитуд спектра
+    case 'FFT' %Р”РџР¤
+        Frequency = SampleRate*(1:MinNFFT/2)/MinNFFT/100; %Р¤РёР·РёС‡РµСЃРєРёРµ С‡Р°СЃС‚РѕС‚С‹ СЃРёРіРЅР°Р»Р°
+        for i = 1:LevelsNumb %Р¦РёРєР» РїРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
+            Y = fft(PartsSignalGlued{i}(:,2),MinNFFT); %РћСЃСѓС‰РµСЃС‚РІР»СЏРµРј Р‘РџР¤
+            Y = Y(1:MinNFFT/2); %РћС‚СЃРµРєР°РµРј СЃРёРјРјРµС‚СЂРёС‡РЅСѓСЋ С‡Р°СЃС‚СЊ
+            P = abs(Y); %РќР°С…РѕРґРёРј Р°РјРїР»РёС‚СѓРґСѓ
+            SpectrumSignal{i} = P; %РњР°СЃСЃРёРІ Р°РјРїР»РёС‚СѓРґ СЃРїРµРєС‚СЂР°
         end
-    case 'Welch' %Спектральная плотность мощности по Уэлчу
-        for i = 1:LevelsNumb %Цикл по всем уровням
+    case 'Welch' %РЎРїРµРєС‚СЂР°Р»СЊРЅР°СЏ РїР»РѕС‚РЅРѕСЃС‚СЊ РјРѕС‰РЅРѕСЃС‚Рё РїРѕ РЈСЌР»С‡Сѓ
+        for i = 1:LevelsNumb %Р¦РёРєР» РїРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
             [SpectrumSignal{i}, Frequency] = pwelch(PartsSignalGlued{i}(:,2), MinNFFT/2, MinNFFT/4, MinNFFT, 1/(SampleRate*1e-6));
         end
 end
-%Аппроксимирование спектра
+%РђРїРїСЂРѕРєСЃРёРјРёСЂРѕРІР°РЅРёРµ СЃРїРµРєС‚СЂР°
 for i = 1:LevelsNumb
     [SpectrumSignal{i},~] = ApproxSpline(Frequency, Frequency, SpectrumSignal{i}, Accuracy, 0);
 end
-%Создание матрицы для визуализации
-SpectrumSignalVisualize = zeros(LevelsNumb, MinNFFT/2); %Выделяем память для таблицы визуализации
+%РЎРѕР·РґР°РЅРёРµ РјР°С‚СЂРёС†С‹ РґР»СЏ РІРёР·СѓР°Р»РёР·Р°С†РёРё
+SpectrumSignalVisualize = zeros(LevelsNumb, MinNFFT/2); %Р’С‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ РґР»СЏ С‚Р°Р±Р»РёС†С‹ РІРёР·СѓР°Р»РёР·Р°С†РёРё
 for i = 1:LevelsNumb
     for j = 1:length(SpectrumSignal{i})
-        SpectrumSignalVisualize(i,j) = SpectrumSignal{i}(j); %Записываем показания по каждому уровню
+        SpectrumSignalVisualize(i,j) = SpectrumSignal{i}(j); %Р—Р°РїРёСЃС‹РІР°РµРј РїРѕРєР°Р·Р°РЅРёСЏ РїРѕ РєР°Р¶РґРѕРјСѓ СѓСЂРѕРІРЅСЋ
     end
 end
-SpectrumSignalVisualize = SpectrumSignalVisualize'; %Транспонируем таблицу
+SpectrumSignalVisualize = SpectrumSignalVisualize'; %РўСЂР°РЅСЃРїРѕРЅРёСЂСѓРµРј С‚Р°Р±Р»РёС†Сѓ
 
 end
 

@@ -1,74 +1,74 @@
 function [FixParts,PartsDerivative,IndexParts,OscillationParts,IndexOscillationParts] = FixNormalizeDerivative(Parts, IndexParts, CutProcent, NormalizeMode)
-%Отсечение коротких фрагментов и нормализация длинных. Вычисление конечных
-%разностей
+%РћС‚СЃРµС‡РµРЅРёРµ РєРѕСЂРѕС‚РєРёС… С„СЂР°РіРјРµРЅС‚РѕРІ Рё РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ РґР»РёРЅРЅС‹С…. Р’С‹С‡РёСЃР»РµРЅРёРµ РєРѕРЅРµС‡РЅС‹С…
+%СЂР°Р·РЅРѕСЃС‚РµР№
 
-LevelsNumb = length(Parts); %Число уровней
-    %Выделение коротких фрагментов
+LevelsNumb = length(Parts); %Р§РёСЃР»Рѕ СѓСЂРѕРІРЅРµР№
+    %Р’С‹РґРµР»РµРЅРёРµ РєРѕСЂРѕС‚РєРёС… С„СЂР°РіРјРµРЅС‚РѕРІ
 for i = 1:LevelsNumb
-    SaveIndex = 0; %Номер конца предыдущего фрагмента    
-    for j = 1:length(IndexParts{i}) %Цикл по всем уровням
-        LengthsFragment{i}(j,1) = length(Parts{i}(SaveIndex + 1:IndexParts{i}(j),2)); %Запись длин всех фрагментов
-        SaveIndex = IndexParts{i}(j); %Запись индекса конца фрагмента        
+    SaveIndex = 0; %РќРѕРјРµСЂ РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°    
+    for j = 1:length(IndexParts{i}) %Р¦РёРєР» РїРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
+        LengthsFragment{i}(j,1) = length(Parts{i}(SaveIndex + 1:IndexParts{i}(j),2)); %Р—Р°РїРёСЃСЊ РґР»РёРЅ РІСЃРµС… С„СЂР°РіРјРµРЅС‚РѕРІ
+        SaveIndex = IndexParts{i}(j); %Р—Р°РїРёСЃСЊ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°        
     end
-    MaxLength(i) = max(LengthsFragment{i}); %Нахождение максимальной длиный для заданного уровня
-    LimCut(i) = ceil(MaxLength(i)*CutProcent); %Предел длины отрезка для каждого из уровней
+    MaxLength(i) = max(LengthsFragment{i}); %РќР°С…РѕР¶РґРµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РґР»РёРЅС‹Р№ РґР»СЏ Р·Р°РґР°РЅРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
+    LimCut(i) = ceil(MaxLength(i)*CutProcent); %РџСЂРµРґРµР» РґР»РёРЅС‹ РѕС‚СЂРµР·РєР° РґР»СЏ РєР°Р¶РґРѕРіРѕ РёР· СѓСЂРѕРІРЅРµР№
 end
-    %Отсечение коротких фрагментов
+    %РћС‚СЃРµС‡РµРЅРёРµ РєРѕСЂРѕС‚РєРёС… С„СЂР°РіРјРµРЅС‚РѕРІ
 for i = 1:LevelsNumb
     SaveIndex = 0;
-    FixParts{i} = []; %Начальное значение усеченных сигнала
-    OscillationParts{i} = []; %Начальное значение файла биений сигнала
+    FixParts{i} = []; %РќР°С‡Р°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ СѓСЃРµС‡РµРЅРЅС‹С… СЃРёРіРЅР°Р»Р°
+    OscillationParts{i} = []; %РќР°С‡Р°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ С„Р°Р№Р»Р° Р±РёРµРЅРёР№ СЃРёРіРЅР°Р»Р°
     for j = 1:size(IndexParts{i},1)
-        if LengthsFragment{i}(j,1) > LimCut(i) %Оценка длины фрагмента
-            FixParts{i} = [FixParts{i};Parts{i}(SaveIndex + 1:IndexParts{i}(j),:)]; %Добавление фрагмента в конец записи
-        elseif LengthsFragment{i}(j,1) > 1 %Пропускаем фрагменты из одной точки
-            OscillationParts{i} = [OscillationParts{i}; Parts{i}(SaveIndex + 1:IndexParts{i}(j),:)]; %Добавление нейтрального фрагмента
+        if LengthsFragment{i}(j,1) > LimCut(i) %РћС†РµРЅРєР° РґР»РёРЅС‹ С„СЂР°РіРјРµРЅС‚Р°
+            FixParts{i} = [FixParts{i};Parts{i}(SaveIndex + 1:IndexParts{i}(j),:)]; %Р”РѕР±Р°РІР»РµРЅРёРµ С„СЂР°РіРјРµРЅС‚Р° РІ РєРѕРЅРµС† Р·Р°РїРёСЃРё
+        elseif LengthsFragment{i}(j,1) > 1 %РџСЂРѕРїСѓСЃРєР°РµРј С„СЂР°РіРјРµРЅС‚С‹ РёР· РѕРґРЅРѕР№ С‚РѕС‡РєРё
+            OscillationParts{i} = [OscillationParts{i}; Parts{i}(SaveIndex + 1:IndexParts{i}(j),:)]; %Р”РѕР±Р°РІР»РµРЅРёРµ РЅРµР№С‚СЂР°Р»СЊРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
         end
-        SaveIndex = IndexParts{i}(j); %Запись индекса конца фрагмента
+        SaveIndex = IndexParts{i}(j); %Р—Р°РїРёСЃСЊ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
     end
-    IndexParts{i} = find(FixParts{i}(:,3) == 1); %Запись номеров фрагментов в локальную переменную
+    IndexParts{i} = find(FixParts{i}(:,3) == 1); %Р—Р°РїРёСЃСЊ РЅРѕРјРµСЂРѕРІ С„СЂР°РіРјРµРЅС‚РѕРІ РІ Р»РѕРєР°Р»СЊРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ
     if IndexParts{i}(end,1) < size(FixParts{i},1)
-        IndexParts{i}(end + 1,1) = size(FixParts{i},1); %Добавление индекса конца последнего фрагмента
+        IndexParts{i}(end + 1,1) = size(FixParts{i},1); %Р”РѕР±Р°РІР»РµРЅРёРµ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° РїРѕСЃР»РµРґРЅРµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
         FixParts{i}(end,3) = 1;
     end
     if ~isempty(OscillationParts{i})
-        IndexOscillationParts{i} = find(OscillationParts{i}(:,3) == 1); %Запись номеров фрагментов в локальную переменную
+        IndexOscillationParts{i} = find(OscillationParts{i}(:,3) == 1); %Р—Р°РїРёСЃСЊ РЅРѕРјРµСЂРѕРІ С„СЂР°РіРјРµРЅС‚РѕРІ РІ Р»РѕРєР°Р»СЊРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ
         if IndexOscillationParts{i}(end,1) < size(OscillationParts{i},1)
-            IndexOscillationParts{i}(end + 1,1) = size(OscillationParts{i},1); %Добавление индекса конца последнего фрагмента
+            IndexOscillationParts{i}(end + 1,1) = size(OscillationParts{i},1); %Р”РѕР±Р°РІР»РµРЅРёРµ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° РїРѕСЃР»РµРґРЅРµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
             OscillationParts{i}(end,3) = 1;
         end
     else
-        IndexOscillationParts{i} = OscillationParts{i}; %Проверка соответствия длин
+        IndexOscillationParts{i} = OscillationParts{i}; %РџСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РґР»РёРЅ
     end
 end
-    %Нормировка каждого фрагмента сигнала 
-for i = 1:LevelsNumb %Цикл по всем уровням
-    SaveIndex = 0; %Номер конца предыдущего фрагмента
-    for j = 1:length(IndexParts{i}) %Цикл по номерам индексов фрагментов
-        MeanTemp = mean(FixParts{i}(SaveIndex + 1:IndexParts{i}(j),2)); %Среднее значение каждого фрагмента
+    %РќРѕСЂРјРёСЂРѕРІРєР° РєР°Р¶РґРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р° СЃРёРіРЅР°Р»Р° 
+for i = 1:LevelsNumb %Р¦РёРєР» РїРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
+    SaveIndex = 0; %РќРѕРјРµСЂ РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+    for j = 1:length(IndexParts{i}) %Р¦РёРєР» РїРѕ РЅРѕРјРµСЂР°Рј РёРЅРґРµРєСЃРѕРІ С„СЂР°РіРјРµРЅС‚РѕРІ
+        MeanTemp = mean(FixParts{i}(SaveIndex + 1:IndexParts{i}(j),2)); %РЎСЂРµРґРЅРµРµ Р·РЅР°С‡РµРЅРёРµ РєР°Р¶РґРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
         FixParts{i}(SaveIndex + 1:IndexParts{i}(j),2) = FixParts{i}(SaveIndex + 1:IndexParts{i}(j),2) - MeanTemp;
-        if NormalizeMode %Нормировка каждого фрагмента по максимуму
-            MaxTemp = max(abs(FixParts{i}(SaveIndex + 1:IndexParts{i}(j),2))); %Локальный максимум фрагмента
-            if MaxTemp ~= 0 %Пропуск нормировки нулевых фрагментов
+        if NormalizeMode %РќРѕСЂРјРёСЂРѕРІРєР° РєР°Р¶РґРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р° РїРѕ РјР°РєСЃРёРјСѓРјСѓ
+            MaxTemp = max(abs(FixParts{i}(SaveIndex + 1:IndexParts{i}(j),2))); %Р›РѕРєР°Р»СЊРЅС‹Р№ РјР°РєСЃРёРјСѓРј С„СЂР°РіРјРµРЅС‚Р°
+            if MaxTemp ~= 0 %РџСЂРѕРїСѓСЃРє РЅРѕСЂРјРёСЂРѕРІРєРё РЅСѓР»РµРІС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
                 FixParts{i}(SaveIndex + 1:IndexParts{i}(j),2) = FixParts{i}(SaveIndex + 1:IndexParts{i}(j),2)./MaxTemp;
             end
         end
-        SaveIndex = IndexParts{i}(j); %Запись индекса конца фрагмента
+        SaveIndex = IndexParts{i}(j); %Р—Р°РїРёСЃСЊ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
     end
 end
-    %Нахождение производных на каждом фрагменте
-for i = 1:LevelsNumb %Цикл по всем уровням
-    SaveIndex = 0; %Номер конца предыдущего фрагмента
-    for j = 1:length(IndexParts{i}) %Цикл по номерам индексов фрагментов
-        if LengthsFragment{i}(j) ~= 1 %Проверка одиночных фрагментов
-            PartsDerivative{i}(IndexParts{i}(j),1) = FixParts{i}(IndexParts{i}(j),2) - FixParts{i}(IndexParts{i}(j) - 1,2); %Левая конечная разность
-            for s = SaveIndex + 1:IndexParts{i}(j) - 1 %Цикл по всем точкам следующего фрагмента
+    %РќР°С…РѕР¶РґРµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅС‹С… РЅР° РєР°Р¶РґРѕРј С„СЂР°РіРјРµРЅС‚Рµ
+for i = 1:LevelsNumb %Р¦РёРєР» РїРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
+    SaveIndex = 0; %РќРѕРјРµСЂ РєРѕРЅС†Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+    for j = 1:length(IndexParts{i}) %Р¦РёРєР» РїРѕ РЅРѕРјРµСЂР°Рј РёРЅРґРµРєСЃРѕРІ С„СЂР°РіРјРµРЅС‚РѕРІ
+        if LengthsFragment{i}(j) ~= 1 %РџСЂРѕРІРµСЂРєР° РѕРґРёРЅРѕС‡РЅС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
+            PartsDerivative{i}(IndexParts{i}(j),1) = FixParts{i}(IndexParts{i}(j),2) - FixParts{i}(IndexParts{i}(j) - 1,2); %Р›РµРІР°СЏ РєРѕРЅРµС‡РЅР°СЏ СЂР°Р·РЅРѕСЃС‚СЊ
+            for s = SaveIndex + 1:IndexParts{i}(j) - 1 %Р¦РёРєР» РїРѕ РІСЃРµРј С‚РѕС‡РєР°Рј СЃР»РµРґСѓСЋС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р°
                 PartsDerivative{i}(s,1) = FixParts{i}(s + 1,2) - FixParts{i}(s,2);
             end
         else
-            PartsDerivative{i}(IndexParts{i}(j),1) = 0; %Обнулить производную, если фрагмент одиночный
+            PartsDerivative{i}(IndexParts{i}(j),1) = 0; %РћР±РЅСѓР»РёС‚СЊ РїСЂРѕРёР·РІРѕРґРЅСѓСЋ, РµСЃР»Рё С„СЂР°РіРјРµРЅС‚ РѕРґРёРЅРѕС‡РЅС‹Р№
         end
-        SaveIndex = IndexParts{i}(j); %Запись индекса конца фрагмента
+        SaveIndex = IndexParts{i}(j); %Р—Р°РїРёСЃСЊ РёРЅРґРµРєСЃР° РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚Р°
     end 
     PartsDerivative{i} = [FixParts{i}(:,1),PartsDerivative{i}];
     PartsDerivative{i}(:,3) = FixParts{i}(:,3);

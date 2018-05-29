@@ -1,71 +1,71 @@
 function NewSignal = CorrectLength(Signal,LengthCorrect,MonotoneFragmentIndent,DepthGluing)
-    %Приведение склеек по длине
+    %РџСЂРёРІРµРґРµРЅРёРµ СЃРєР»РµРµРє РїРѕ РґР»РёРЅРµ
 
-if LengthCorrect == 0 %Если приведение по длине не включено
-    NewSignal = Signal; %Возвращаем исходные данные
+if LengthCorrect == 0 %Р•СЃР»Рё РїСЂРёРІРµРґРµРЅРёРµ РїРѕ РґР»РёРЅРµ РЅРµ РІРєР»СЋС‡РµРЅРѕ
+    NewSignal = Signal; %Р’РѕР·РІСЂР°С‰Р°РµРј РёСЃС…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ
     return;
 end
-    %Проверка формата ввода
+    %РџСЂРѕРІРµСЂРєР° С„РѕСЂРјР°С‚Р° РІРІРѕРґР°
 if iscell(Signal) 
-    LevelsNumb = length(Signal); %Число уровней
+    LevelsNumb = length(Signal); %Р§РёСЃР»Рѕ СѓСЂРѕРІРЅРµР№
 else
-    error('Формат входных данных: cell');
+    error('Р¤РѕСЂРјР°С‚ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…: cell');
 end
-    %Приведение к единому фрагменту
+    %РџСЂРёРІРµРґРµРЅРёРµ Рє РµРґРёРЅРѕРјСѓ С„СЂР°РіРјРµРЅС‚Сѓ
 for i = 1:LevelsNumb
-    TempIndex = find(Signal{i}(:,3) == 1); %Индексы всех фрагментов
-    TempIndex(end) = []; %За исключением конца
+    TempIndex = find(Signal{i}(:,3) == 1); %РРЅРґРµРєСЃС‹ РІСЃРµС… С„СЂР°РіРјРµРЅС‚РѕРІ
+    TempIndex(end) = []; %Р—Р° РёСЃРєР»СЋС‡РµРЅРёРµРј РєРѕРЅС†Р°
     Signal{i}(TempIndex,3) = 0; 
 end
-    %Вычисление производных
+    %Р’С‹С‡РёСЃР»РµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅС‹С…
 for i = 1:LevelsNumb
     for j = 1:size(Signal{i},1) - 1
         SignalDerivative{i}(j,2) = Signal{i}(j + 1,2) - Signal{i}(j,2);        
     end
-    SignalDerivative{i}(end + 1,2) = Signal{i}(end,2) - Signal{i}(end - 1,2); %Левая конечная разность
-    SignalDerivative{i}(:,1) = Signal{i}(:,1); %Глобальные индексы
-    SignalDerivative{i}(:,3) = Signal{i}(:,3); %Индексы конца фрагментов
-    %Удвоение для паттерна
-    TempSignal{i} = [Signal{i}; Signal{i}]; %Сигнал
-    TempSignalDerivative{i} = [SignalDerivative{i}; SignalDerivative{i}]; %Производные
-    %Получение индексов
+    SignalDerivative{i}(end + 1,2) = Signal{i}(end,2) - Signal{i}(end - 1,2); %Р›РµРІР°СЏ РєРѕРЅРµС‡РЅР°СЏ СЂР°Р·РЅРѕСЃС‚СЊ
+    SignalDerivative{i}(:,1) = Signal{i}(:,1); %Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РёРЅРґРµРєСЃС‹
+    SignalDerivative{i}(:,3) = Signal{i}(:,3); %РРЅРґРµРєСЃС‹ РєРѕРЅС†Р° С„СЂР°РіРјРµРЅС‚РѕРІ
+    %РЈРґРІРѕРµРЅРёРµ РґР»СЏ РїР°С‚С‚РµСЂРЅР°
+    TempSignal{i} = [Signal{i}; Signal{i}]; %РЎРёРіРЅР°Р»
+    TempSignalDerivative{i} = [SignalDerivative{i}; SignalDerivative{i}]; %РџСЂРѕРёР·РІРѕРґРЅС‹Рµ
+    %РџРѕР»СѓС‡РµРЅРёРµ РёРЅРґРµРєСЃРѕРІ
     IndexTempSignal{i} = find(TempSignal{i}(:,3) == 1);
 end
-    %Вызов оптимальной склейки
-if ~MonotoneFragmentIndent %Для работы с монотонными фрагментами
-    [SignalGlued FailSignalGlued] = OptimalGluing(IndexTempSignal,TempSignal,TempSignalDerivative,0.4,DepthGluing); %Для работы с сигналом, делённым на уровни
-    %Выделения паттерна для клонирования
-    for i = 1:LevelsNumb %Цикл по числу уровней
-        IndexSignalGlued{i} = find(SignalGlued{i}(:,3) == 1); %Выделение индексов двух фрагментов
-        Pattern{i} = SignalGlued{i}(IndexSignalGlued{i}(1) + 1:end,:); %Забираем паттерн
+    %Р’С‹Р·РѕРІ РѕРїС‚РёРјР°Р»СЊРЅРѕР№ СЃРєР»РµР№РєРё
+if ~MonotoneFragmentIndent %Р”Р»СЏ СЂР°Р±РѕС‚С‹ СЃ РјРѕРЅРѕС‚РѕРЅРЅС‹РјРё С„СЂР°РіРјРµРЅС‚Р°РјРё
+    [SignalGlued FailSignalGlued] = OptimalGluing(IndexTempSignal,TempSignal,TempSignalDerivative,0.4,DepthGluing); %Р”Р»СЏ СЂР°Р±РѕС‚С‹ СЃ СЃРёРіРЅР°Р»РѕРј, РґРµР»С‘РЅРЅС‹Рј РЅР° СѓСЂРѕРІРЅРё
+    %Р’С‹РґРµР»РµРЅРёСЏ РїР°С‚С‚РµСЂРЅР° РґР»СЏ РєР»РѕРЅРёСЂРѕРІР°РЅРёСЏ
+    for i = 1:LevelsNumb %Р¦РёРєР» РїРѕ С‡РёСЃР»Сѓ СѓСЂРѕРІРЅРµР№
+        IndexSignalGlued{i} = find(SignalGlued{i}(:,3) == 1); %Р’С‹РґРµР»РµРЅРёРµ РёРЅРґРµРєСЃРѕРІ РґРІСѓС… С„СЂР°РіРјРµРЅС‚РѕРІ
+        Pattern{i} = SignalGlued{i}(IndexSignalGlued{i}(1) + 1:end,:); %Р—Р°Р±РёСЂР°РµРј РїР°С‚С‚РµСЂРЅ
     end
 else
-    for i = 1:LevelsNumb %Цикл по числу уровней
-        Pattern{i} = Signal{i}; %Забираем паттерн
+    for i = 1:LevelsNumb %Р¦РёРєР» РїРѕ С‡РёСЃР»Сѓ СѓСЂРѕРІРЅРµР№
+        Pattern{i} = Signal{i}; %Р—Р°Р±РёСЂР°РµРј РїР°С‚С‚РµСЂРЅ
         SignalGlued{i} = Signal{i}; 
     end
 end
-    %Приведение к длине
-for i = 1:LevelsNumb %Цикл по всем уровням
-    CopyNumb = ceil(LengthCorrect/length(Pattern{i})); %Число копирований по длине
-    if CopyNumb > 1 %Если склейка больше заданной длины
+    %РџСЂРёРІРµРґРµРЅРёРµ Рє РґР»РёРЅРµ
+for i = 1:LevelsNumb %Р¦РёРєР» РїРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
+    CopyNumb = ceil(LengthCorrect/length(Pattern{i})); %Р§РёСЃР»Рѕ РєРѕРїРёСЂРѕРІР°РЅРёР№ РїРѕ РґР»РёРЅРµ
+    if CopyNumb > 1 %Р•СЃР»Рё СЃРєР»РµР№РєР° Р±РѕР»СЊС€Рµ Р·Р°РґР°РЅРЅРѕР№ РґР»РёРЅС‹
         NewSignal{i} = [Signal{i};Pattern{i}];
-        for j = 1:CopyNumb %Копируем CopyNumb раз
+        for j = 1:CopyNumb %РљРѕРїРёСЂСѓРµРј CopyNumb СЂР°Р·
             NewSignal{i} = [NewSignal{i}; Pattern{i}];
         end
     else
         NewSignal{i} = Signal{i}(1:LengthCorrect,:);
-        NewSignal{i}(end,3) = 1; %Новые конец
+        NewSignal{i}(end,3) = 1; %РќРѕРІС‹Рµ РєРѕРЅРµС†
     end
     IndexNewSignal{i} = find(NewSignal{i}(:,3) == 1);
 end
-    %При работе с монотонными фрагментами провести повторную склейку
+    %РџСЂРё СЂР°Р±РѕС‚Рµ СЃ РјРѕРЅРѕС‚РѕРЅРЅС‹РјРё С„СЂР°РіРјРµРЅС‚Р°РјРё РїСЂРѕРІРµСЃС‚Рё РїРѕРІС‚РѕСЂРЅСѓСЋ СЃРєР»РµР№РєСѓ
 if MonotoneFragmentIndent  
     NewSignal = SimpleGluing(NewSignal, IndexNewSignal);
 end
-    %Проверка по длине
+    %РџСЂРѕРІРµСЂРєР° РїРѕ РґР»РёРЅРµ
 for i = 1:LevelsNumb
-    if length(NewSignal{i}) > LengthCorrect %Корректировка по длине
+    if length(NewSignal{i}) > LengthCorrect %РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° РїРѕ РґР»РёРЅРµ
         NewSignal{i} = NewSignal{i}(1:LengthCorrect,:);
         NewSignal{i}(end,3) = 1;
     end

@@ -1,11 +1,11 @@
 function [Signal, DependentArray] = PeakFilter(Signal, DependentArray)
-%Простой фильтр пиков
+%РџСЂРѕСЃС‚РѕР№ С„РёР»СЊС‚СЂ РїРёРєРѕРІ
 
-DerivativeSignal = diff(Signal); %Находим первую производную от сигнала
-Deviation = std(DerivativeSignal); %Стандартное отклонение производной
-DelIndicies = find(abs(DerivativeSignal) > 3*Deviation); %Индексы выбросов
-Signal(DelIndicies) = []; %Удаление выбросов
-if ~isempty(DependentArray) %Корректировка зависимых массивов по заданному порядку
+DerivativeSignal = diff(Signal); %РќР°С…РѕРґРёРј РїРµСЂРІСѓСЋ РїСЂРѕРёР·РІРѕРґРЅСѓСЋ РѕС‚ СЃРёРіРЅР°Р»Р°
+Deviation = std(DerivativeSignal); %РЎС‚Р°РЅРґР°СЂС‚РЅРѕРµ РѕС‚РєР»РѕРЅРµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅРѕР№
+DelIndicies = find(abs(DerivativeSignal) > 3*Deviation); %РРЅРґРµРєСЃС‹ РІС‹Р±СЂРѕСЃРѕРІ
+Signal(DelIndicies) = []; %РЈРґР°Р»РµРЅРёРµ РІС‹Р±СЂРѕСЃРѕРІ
+if ~isempty(DependentArray) %РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° Р·Р°РІРёСЃРёРјС‹С… РјР°СЃСЃРёРІРѕРІ РїРѕ Р·Р°РґР°РЅРЅРѕРјСѓ РїРѕСЂСЏРґРєСѓ
     DependentArray(DelIndicies,:) = [];
 else
     DependentArray = 0;

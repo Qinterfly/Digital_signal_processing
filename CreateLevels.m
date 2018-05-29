@@ -1,34 +1,34 @@
 function LineLevels = CreateLevels(Signal, LevelsStep, OverlapFactor)
-%Создание уровней для заданного сигнала и шага уровней
+%РЎРѕР·РґР°РЅРёРµ СѓСЂРѕРІРЅРµР№ РґР»СЏ Р·Р°РґР°РЅРЅРѕРіРѕ СЃРёРіРЅР°Р»Р° Рё С€Р°РіР° СѓСЂРѕРІРЅРµР№
 
-if ~OverlapFactor %Соотношение эквивалентности разбиения перекрывающихся уровней
+if ~OverlapFactor %РЎРѕРѕС‚РЅРѕС€РµРЅРёРµ СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕСЃС‚Рё СЂР°Р·Р±РёРµРЅРёСЏ РїРµСЂРµРєСЂС‹РІР°СЋС‰РёС…СЃСЏ СѓСЂРѕРІРЅРµР№
    OverlapFactor = 1; 
 end
-%Отсчетные значения
-MaxSignal = max(Signal); %Максимальное значение функции пермещений
-MeanSignal = mean(Signal); %Среднее значение функции пермещений
-MinSignal = min(Signal); %Минимальное значение функции перемещений
+%РћС‚СЃС‡РµС‚РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
+MaxSignal = max(Signal); %РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ С„СѓРЅРєС†РёРё РїРµСЂРјРµС‰РµРЅРёР№
+MeanSignal = mean(Signal); %РЎСЂРµРґРЅРµРµ Р·РЅР°С‡РµРЅРёРµ С„СѓРЅРєС†РёРё РїРµСЂРјРµС‰РµРЅРёР№
+MinSignal = min(Signal); %РњРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ С„СѓРЅРєС†РёРё РїРµСЂРµРјРµС‰РµРЅРёР№
 
-%Реализация единственного уровня
+%Р РµР°Р»РёР·Р°С†РёСЏ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 if MaxSignal <= (mean(Signal) + LevelsStep/2) && MinSignal >= (mean(Signal) - LevelsStep/2)
-    LineLevels(1,:) = [mean(Signal) - LevelsStep/2, mean(Signal) + LevelsStep/2, 0]; %Единичное срединное окно    
+    LineLevels(1,:) = [mean(Signal) - LevelsStep/2, mean(Signal) + LevelsStep/2, 0]; %Р•РґРёРЅРёС‡РЅРѕРµ СЃСЂРµРґРёРЅРЅРѕРµ РѕРєРЅРѕ    
     return;
 end
 
-%Разбивка от min сигнала
-LineLevels(1,:) = [min(Signal), min(Signal) + LevelsStep, -1]; %Параметры нулевого уровня 
-i = 1; %Начальное значение инкремента
-while 1 %Формируем нижние уровни
+%Р Р°Р·Р±РёРІРєР° РѕС‚ min СЃРёРіРЅР°Р»Р°
+LineLevels(1,:) = [min(Signal), min(Signal) + LevelsStep, -1]; %РџР°СЂР°РјРµС‚СЂС‹ РЅСѓР»РµРІРѕРіРѕ СѓСЂРѕРІРЅСЏ 
+i = 1; %РќР°С‡Р°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РёРЅРєСЂРµРјРµРЅС‚Р°
+while 1 %Р¤РѕСЂРјРёСЂСѓРµРј РЅРёР¶РЅРёРµ СѓСЂРѕРІРЅРё
     if LineLevels(i,2) >= MaxSignal
         break;
     end
-    i = i + 1; %Приращение инкремента
-    LineLevels(i,:) = [LineLevels(i - 1, 1) + OverlapFactor*LevelsStep, LineLevels(i - 1, 2) + OverlapFactor*LevelsStep, -1]; %Запись значений линий уровня для нижней части
+    i = i + 1; %РџСЂРёСЂР°С‰РµРЅРёРµ РёРЅРєСЂРµРјРµРЅС‚Р°
+    LineLevels(i,:) = [LineLevels(i - 1, 1) + OverlapFactor*LevelsStep, LineLevels(i - 1, 2) + OverlapFactor*LevelsStep, -1]; %Р—Р°РїРёСЃСЊ Р·РЅР°С‡РµРЅРёР№ Р»РёРЅРёР№ СѓСЂРѕРІРЅСЏ РґР»СЏ РЅРёР¶РЅРµР№ С‡Р°СЃС‚Рё
 end
-%Нумерация уровней
-IndexZeroLevel = floor(size(LineLevels,1)/2); %Индекс нулевого уровня
-LineLevels(IndexZeroLevel,3) = 0; %Проставление номера уровня
-LineLevels(1:IndexZeroLevel - 1,3) = -(IndexZeroLevel - 1):-1; %Нижние уровни
-LineLevels(IndexZeroLevel + 1:end,3) = 1:(size(LineLevels,1) - IndexZeroLevel); %Нижние уровни
+%РќСѓРјРµСЂР°С†РёСЏ СѓСЂРѕРІРЅРµР№
+IndexZeroLevel = floor(size(LineLevels,1)/2); %РРЅРґРµРєСЃ РЅСѓР»РµРІРѕРіРѕ СѓСЂРѕРІРЅСЏ
+LineLevels(IndexZeroLevel,3) = 0; %РџСЂРѕСЃС‚Р°РІР»РµРЅРёРµ РЅРѕРјРµСЂР° СѓСЂРѕРІРЅСЏ
+LineLevels(1:IndexZeroLevel - 1,3) = -(IndexZeroLevel - 1):-1; %РќРёР¶РЅРёРµ СѓСЂРѕРІРЅРё
+LineLevels(IndexZeroLevel + 1:end,3) = 1:(size(LineLevels,1) - IndexZeroLevel); %РќРёР¶РЅРёРµ СѓСЂРѕРІРЅРё
 
 end

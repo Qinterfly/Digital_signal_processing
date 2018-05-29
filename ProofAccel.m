@@ -1,220 +1,220 @@
-function Result = ProofAccel(FileNameDisplacement,... %Имя файла c перемещениями
-                                FileNameAccel,... %Имя файла c ускорениями
-                                StartReadNumbDisplacement,... %Номер отсчётной строки для перемещений
-                                StartReadNumbAccel,... %Номер отсчётной строки для ускорений
-                                LevelsStep,...%Высота уровней
-                                Accuracy,... %Точность аппроксимации
-                                CutProcent,... %Процент усечения фрагментов
-                                CorrectDisplacement,... %Корректировка линейного дрейфа оборудования
-                                CutOffFrequency,... %Частота среза, Гц
-                                CorrectLengthMode,... %Режим приведения по длине 
-                                AccuracyExp,... %Точность выделения экспонециального затухания
-                                LimExpAccelLevel,... %Предельное значение диапазона ускорений 
-                                FreqDecrement,... %Частота выделения декремента затуханий
-                                DepthGluing,... %Глубина склейки                           
-                                ModelApprox,... %Модель выделения декремента затуханий
-                                OverlapFactor,... %Коэффициент перекрытия границ уровней
-                                AccuracySpectrum,... %Точность аппроксимации спектров
-                                NormalizeMode) %Режим нормировки склеек
+function Result = ProofAccel(FileNameDisplacement,... %РРјСЏ С„Р°Р№Р»Р° c РїРµСЂРµРјРµС‰РµРЅРёСЏРјРё
+                                FileNameAccel,... %РРјСЏ С„Р°Р№Р»Р° c СѓСЃРєРѕСЂРµРЅРёСЏРјРё
+                                StartReadNumbDisplacement,... %РќРѕРјРµСЂ РѕС‚СЃС‡С‘С‚РЅРѕР№ СЃС‚СЂРѕРєРё РґР»СЏ РїРµСЂРµРјРµС‰РµРЅРёР№
+                                StartReadNumbAccel,... %РќРѕРјРµСЂ РѕС‚СЃС‡С‘С‚РЅРѕР№ СЃС‚СЂРѕРєРё РґР»СЏ СѓСЃРєРѕСЂРµРЅРёР№
+                                LevelsStep,...%Р’С‹СЃРѕС‚Р° СѓСЂРѕРІРЅРµР№
+                                Accuracy,... %РўРѕС‡РЅРѕСЃС‚СЊ Р°РїРїСЂРѕРєСЃРёРјР°С†РёРё
+                                CutProcent,... %РџСЂРѕС†РµРЅС‚ СѓСЃРµС‡РµРЅРёСЏ С„СЂР°РіРјРµРЅС‚РѕРІ
+                                CorrectDisplacement,... %РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° Р»РёРЅРµР№РЅРѕРіРѕ РґСЂРµР№С„Р° РѕР±РѕСЂСѓРґРѕРІР°РЅРёСЏ
+                                CutOffFrequency,... %Р§Р°СЃС‚РѕС‚Р° СЃСЂРµР·Р°, Р“С†
+                                CorrectLengthMode,... %Р РµР¶РёРј РїСЂРёРІРµРґРµРЅРёСЏ РїРѕ РґР»РёРЅРµ 
+                                AccuracyExp,... %РўРѕС‡РЅРѕСЃС‚СЊ РІС‹РґРµР»РµРЅРёСЏ СЌРєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕРіРѕ Р·Р°С‚СѓС…Р°РЅРёСЏ
+                                LimExpAccelLevel,... %РџСЂРµРґРµР»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґРёР°РїР°Р·РѕРЅР° СѓСЃРєРѕСЂРµРЅРёР№ 
+                                FreqDecrement,... %Р§Р°СЃС‚РѕС‚Р° РІС‹РґРµР»РµРЅРёСЏ РґРµРєСЂРµРјРµРЅС‚Р° Р·Р°С‚СѓС…Р°РЅРёР№
+                                DepthGluing,... %Р“Р»СѓР±РёРЅР° СЃРєР»РµР№РєРё                           
+                                ModelApprox,... %РњРѕРґРµР»СЊ РІС‹РґРµР»РµРЅРёСЏ РґРµРєСЂРµРјРµРЅС‚Р° Р·Р°С‚СѓС…Р°РЅРёР№
+                                OverlapFactor,... %РљРѕСЌС„С„РёС†РёРµРЅС‚ РїРµСЂРµРєСЂС‹С‚РёСЏ РіСЂР°РЅРёС† СѓСЂРѕРІРЅРµР№
+                                AccuracySpectrum,... %РўРѕС‡РЅРѕСЃС‚СЊ Р°РїРїСЂРѕРєСЃРёРјР°С†РёРё СЃРїРµРєС‚СЂРѕРІ
+                                NormalizeMode) %Р РµР¶РёРј РЅРѕСЂРјРёСЂРѕРІРєРё СЃРєР»РµРµРє
                             
-%% +==================== Информация о программе ==========================+
+%% +==================== РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїСЂРѕРіСЂР°РјРјРµ ==========================+
 
-%   Автор: П.А. Лакиза.
-%   Версия: 3.6
-%   Изменения:   
-%   - Добавлены дополнительные статистические критерии
-%  Дата: 26.04.2018
+%   РђРІС‚РѕСЂ: Рџ.Рђ. Р›Р°РєРёР·Р°.
+%   Р’РµСЂСЃРёСЏ: 3.6
+%   РР·РјРµРЅРµРЅРёСЏ:   
+%   - Р”РѕР±Р°РІР»РµРЅС‹ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ СЃС‚Р°С‚РёСЃС‚РёС‡РµСЃРєРёРµ РєСЂРёС‚РµСЂРёРё
+%  Р”Р°С‚Р°: 26.04.2018
 
-%% +========================= Служебный блок =============================+
+%% +========================= РЎР»СѓР¶РµР±РЅС‹Р№ Р±Р»РѕРє =============================+
 
 TestMode = 0;
-if TestMode %Режим отладки
-    %Очищаем рабочую область
+if TestMode %Р РµР¶РёРј РѕС‚Р»Р°РґРєРё
+    %РћС‡РёС‰Р°РµРј СЂР°Р±РѕС‡СѓСЋ РѕР±Р»Р°СЃС‚СЊ
     clc; clear variables; close all;
-    %Добавляем рабочие директории
-    addpath('Signals', 'Signals/31 km T16'); %Исходные и выходные данные
-    addpath('Export_fig'); %Библиотека сохранения изображений
+    %Р”РѕР±Р°РІР»СЏРµРј СЂР°Р±РѕС‡РёРµ РґРёСЂРµРєС‚РѕСЂРёРё
+    addpath('Signals', 'Signals/31 km T16'); %РСЃС…РѕРґРЅС‹Рµ Рё РІС‹С…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ
+    addpath('Export_fig'); %Р‘РёР±Р»РёРѕС‚РµРєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ РёР·РѕР±СЂР°Р¶РµРЅРёР№
     
-    %% +========================= Исходные данные ============================+    
+    %% +========================= РСЃС…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ ============================+    
     
-    FileNameDisplacement = ''; %Имя файла c перемещениями
-    FileNameAccel = '20130924121219_2.txt'; %Имя файла c ускорениями
-    StartReadNumbDisplacement = 12; %Номер отсчётной строки для перемещений
-    StartReadNumbAccel = 12; %Номер отсчётной строки для ускорений
-    SaveMode = false; %Режим сохранения файлов
+    FileNameDisplacement = ''; %РРјСЏ С„Р°Р№Р»Р° c РїРµСЂРµРјРµС‰РµРЅРёСЏРјРё
+    FileNameAccel = '20130924121219_2.txt'; %РРјСЏ С„Р°Р№Р»Р° c СѓСЃРєРѕСЂРµРЅРёСЏРјРё
+    StartReadNumbDisplacement = 12; %РќРѕРјРµСЂ РѕС‚СЃС‡С‘С‚РЅРѕР№ СЃС‚СЂРѕРєРё РґР»СЏ РїРµСЂРµРјРµС‰РµРЅРёР№
+    StartReadNumbAccel = 12; %РќРѕРјРµСЂ РѕС‚СЃС‡С‘С‚РЅРѕР№ СЃС‚СЂРѕРєРё РґР»СЏ СѓСЃРєРѕСЂРµРЅРёР№
+    SaveMode = false; %Р РµР¶РёРј СЃРѕС…СЂР°РЅРµРЅРёСЏ С„Р°Р№Р»РѕРІ
     
-    LevelsStep = 3000; %Ширина уровня
-    Accuracy = 1e-7; %Точность аппроксимации
-    ShowNumb = 2; %Номер линий уровня для отображения
-    CutProcent = 0.2; %Процент усечения фрагментов
-    CorrectDisplacement = true; %Корректировка линейного дрейфа оборудования
-    CutOffFrequency = 0.1; %Частота среза, Гц
-    CorrectLengthMode = 'No'; %Режим приведения по длине == (No, Maximum, Input)
-    AccuracyExp = 1e-7; %Точность выделения экспонециального затухания
-    LimExpAccelLevel = 0.13; %Предельное значение диапазона ускорений
-    FreqDecrement = 5; %Частота выделения декремента затуханий
-    DepthGluing = 0; %Глубина склейки
-    ModelApprox = 'B-Spline'; %Модель выделения декремента затуханий
-    DeltaLevelsStepProcent = 0.1; %Смещение границы уровней в долях
-    AccuracySpectrum = 0.95; %Точность аппроксимации спектров
-    NormalizeMode = 0; %Режим нормировки склеек
-    OverlapFactor = 0.2; %Коэффициент перекрытия уровней
+    LevelsStep = 3000; %РЁРёСЂРёРЅР° СѓСЂРѕРІРЅСЏ
+    Accuracy = 1e-7; %РўРѕС‡РЅРѕСЃС‚СЊ Р°РїРїСЂРѕРєСЃРёРјР°С†РёРё
+    ShowNumb = 2; %РќРѕРјРµСЂ Р»РёРЅРёР№ СѓСЂРѕРІРЅСЏ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+    CutProcent = 0.2; %РџСЂРѕС†РµРЅС‚ СѓСЃРµС‡РµРЅРёСЏ С„СЂР°РіРјРµРЅС‚РѕРІ
+    CorrectDisplacement = true; %РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° Р»РёРЅРµР№РЅРѕРіРѕ РґСЂРµР№С„Р° РѕР±РѕСЂСѓРґРѕРІР°РЅРёСЏ
+    CutOffFrequency = 0.1; %Р§Р°СЃС‚РѕС‚Р° СЃСЂРµР·Р°, Р“С†
+    CorrectLengthMode = 'No'; %Р РµР¶РёРј РїСЂРёРІРµРґРµРЅРёСЏ РїРѕ РґР»РёРЅРµ == (No, Maximum, Input)
+    AccuracyExp = 1e-7; %РўРѕС‡РЅРѕСЃС‚СЊ РІС‹РґРµР»РµРЅРёСЏ СЌРєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕРіРѕ Р·Р°С‚СѓС…Р°РЅРёСЏ
+    LimExpAccelLevel = 0.13; %РџСЂРµРґРµР»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґРёР°РїР°Р·РѕРЅР° СѓСЃРєРѕСЂРµРЅРёР№
+    FreqDecrement = 5; %Р§Р°СЃС‚РѕС‚Р° РІС‹РґРµР»РµРЅРёСЏ РґРµРєСЂРµРјРµРЅС‚Р° Р·Р°С‚СѓС…Р°РЅРёР№
+    DepthGluing = 0; %Р“Р»СѓР±РёРЅР° СЃРєР»РµР№РєРё
+    ModelApprox = 'B-Spline'; %РњРѕРґРµР»СЊ РІС‹РґРµР»РµРЅРёСЏ РґРµРєСЂРµРјРµРЅС‚Р° Р·Р°С‚СѓС…Р°РЅРёР№
+    DeltaLevelsStepProcent = 0.1; %РЎРјРµС‰РµРЅРёРµ РіСЂР°РЅРёС†С‹ СѓСЂРѕРІРЅРµР№ РІ РґРѕР»СЏС…
+    AccuracySpectrum = 0.95; %РўРѕС‡РЅРѕСЃС‚СЊ Р°РїРїСЂРѕРєСЃРёРјР°С†РёРё СЃРїРµРєС‚СЂРѕРІ
+    NormalizeMode = 0; %Р РµР¶РёРј РЅРѕСЂРјРёСЂРѕРІРєРё СЃРєР»РµРµРє
+    OverlapFactor = 0.2; %РљРѕСЌС„С„РёС†РёРµРЅС‚ РїРµСЂРµРєСЂС‹С‚РёСЏ СѓСЂРѕРІРЅРµР№
     
 end
 
-%% +======================= Считывание данных ============================+
+%% +======================= РЎС‡РёС‚С‹РІР°РЅРёРµ РґР°РЅРЅС‹С… ============================+
 
-ReadMode = 'Complex'; %Режим считывания данных с перемещений и ускорений
+ReadMode = 'Complex'; %Р РµР¶РёРј СЃС‡РёС‚С‹РІР°РЅРёСЏ РґР°РЅРЅС‹С… СЃ РїРµСЂРµРјРµС‰РµРЅРёР№ Рё СѓСЃРєРѕСЂРµРЅРёР№
 if isempty(FileNameDisplacement) 
-    ReadMode = 'Accel'; %Режим считавания данных с ускорений
+    ReadMode = 'Accel'; %Р РµР¶РёРј СЃС‡РёС‚Р°РІР°РЅРёСЏ РґР°РЅРЅС‹С… СЃ СѓСЃРєРѕСЂРµРЅРёР№
 end
 
-switch ReadMode %Считывание данных в зависимости от режима
+switch ReadMode %РЎС‡РёС‚С‹РІР°РЅРёРµ РґР°РЅРЅС‹С… РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЂРµР¶РёРјР°
     case 'Complex'
-        %Считывание файла перемещений
+        %РЎС‡РёС‚С‹РІР°РЅРёРµ С„Р°Р№Р»Р° РїРµСЂРµРјРµС‰РµРЅРёР№
         [InputDataDisplacement TechnicalDataDisplacement Displacement] = ReadInput(FileNameDisplacement,StartReadNumbDisplacement);
-        %Считывание файла ускорений
+        %РЎС‡РёС‚С‹РІР°РЅРёРµ С„Р°Р№Р»Р° СѓСЃРєРѕСЂРµРЅРёР№
         [InputDataAccel TechnicalDataAccel Accel] = ReadInput(FileNameAccel,StartReadNumbAccel);
-        if length(Accel) ~= length(Displacement) %Проверка совпадаения длин записей
-            error('Длины записи сигнала перемещений и ускорений не совпадают');
+        if length(Accel) ~= length(Displacement) %РџСЂРѕРІРµСЂРєР° СЃРѕРІРїР°РґР°РµРЅРёСЏ РґР»РёРЅ Р·Р°РїРёСЃРµР№
+            error('Р”Р»РёРЅС‹ Р·Р°РїРёСЃРё СЃРёРіРЅР°Р»Р° РїРµСЂРµРјРµС‰РµРЅРёР№ Рё СѓСЃРєРѕСЂРµРЅРёР№ РЅРµ СЃРѕРІРїР°РґР°СЋС‚');
         end
     case 'Accel'
-        %Считывание файла ускорений
+        %РЎС‡РёС‚С‹РІР°РЅРёРµ С„Р°Р№Р»Р° СѓСЃРєРѕСЂРµРЅРёР№
         [InputDataAccel TechnicalDataAccel Accel] = ReadInput(FileNameAccel,StartReadNumbAccel);
-        [Accel,~] = PeakFilter(Accel, []); %Удаление выбросов ускорений
+        [Accel,~] = PeakFilter(Accel, []); %РЈРґР°Р»РµРЅРёРµ РІС‹Р±СЂРѕСЃРѕРІ СѓСЃРєРѕСЂРµРЅРёР№
 end
-Time = (1:length(Accel))'; %Массив времени
-SampleRate = str2num(TechnicalDataAccel{end - 2}); %Частота дискретизации
-clear InputDataAccel InputDataDisplacement; %Очищаем промежуточные переменные
+Time = (1:length(Accel))'; %РњР°СЃСЃРёРІ РІСЂРµРјРµРЅРё
+SampleRate = str2num(TechnicalDataAccel{end - 2}); %Р§Р°СЃС‚РѕС‚Р° РґРёСЃРєСЂРµС‚РёР·Р°С†РёРё
+clear InputDataAccel InputDataDisplacement; %РћС‡РёС‰Р°РµРј РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
 
-%% +============================ Расчёт ==================================+
+%% +============================ Р Р°СЃС‡С‘С‚ ==================================+
 
-switch ReadMode %Работа с данными в зависимости от режима
+switch ReadMode %Р Р°Р±РѕС‚Р° СЃ РґР°РЅРЅС‹РјРё РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЂРµР¶РёРјР°
     case 'Complex'
-        Accel = Accel - Accel(1); %Приведение ускорений к нулевой линии
-        Displacement = Displacement - Displacement(1); %Приведение перемещений к нулевой линии
+        Accel = Accel - Accel(1); %РџСЂРёРІРµРґРµРЅРёРµ СѓСЃРєРѕСЂРµРЅРёР№ Рє РЅСѓР»РµРІРѕР№ Р»РёРЅРёРё
+        Displacement = Displacement - Displacement(1); %РџСЂРёРІРµРґРµРЅРёРµ РїРµСЂРµРјРµС‰РµРЅРёР№ Рє РЅСѓР»РµРІРѕР№ Р»РёРЅРёРё
     case 'Accel'
-        %Считывание файла ускорений
-        Accel = Accel - Accel(1); %Приведение ускорений к нулевой линии
-        Displacement = DoubleIntegral(Time, Accel, CutOffFrequency, SampleRate); %Получение перемещений двойным интегрированием ускорений
+        %РЎС‡РёС‚С‹РІР°РЅРёРµ С„Р°Р№Р»Р° СѓСЃРєРѕСЂРµРЅРёР№
+        Accel = Accel - Accel(1); %РџСЂРёРІРµРґРµРЅРёРµ СѓСЃРєРѕСЂРµРЅРёР№ Рє РЅСѓР»РµРІРѕР№ Р»РёРЅРёРё
+        Displacement = DoubleIntegral(Time, Accel, CutOffFrequency, SampleRate); %РџРѕР»СѓС‡РµРЅРёРµ РїРµСЂРµРјРµС‰РµРЅРёР№ РґРІРѕР№РЅС‹Рј РёРЅС‚РµРіСЂРёСЂРѕРІР°РЅРёРµРј СѓСЃРєРѕСЂРµРЅРёР№
 end  
-if CorrectDisplacement %Проверка режима коррекции линейного дрейфа
-    Displacement = LineCorrect(Time, Displacement); %Отсечение низкочастотной части сигнала перемещений
+if CorrectDisplacement %РџСЂРѕРІРµСЂРєР° СЂРµР¶РёРјР° РєРѕСЂСЂРµРєС†РёРё Р»РёРЅРµР№РЅРѕРіРѕ РґСЂРµР№С„Р°
+    Displacement = LineCorrect(Time, Displacement); %РћС‚СЃРµС‡РµРЅРёРµ РЅРёР·РєРѕС‡Р°СЃС‚РѕС‚РЅРѕР№ С‡Р°СЃС‚Рё СЃРёРіРЅР°Р»Р° РїРµСЂРµРјРµС‰РµРЅРёР№
 end
-    %Аппроксимация функции перемещений
-[DisplacementApprox DisplacementApproxDerivative] = ApproxSpline(Time, Time, Displacement,Accuracy,1); %Аппроксимация B-сплайнами
-    %Выделение уровней
+    %РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ С„СѓРЅРєС†РёРё РїРµСЂРµРјРµС‰РµРЅРёР№
+[DisplacementApprox DisplacementApproxDerivative] = ApproxSpline(Time, Time, Displacement,Accuracy,1); %РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ B-СЃРїР»Р°Р№РЅР°РјРё
+    %Р’С‹РґРµР»РµРЅРёРµ СѓСЂРѕРІРЅРµР№
 LineLevels = CreateLevels(DisplacementApprox, LevelsStep, OverlapFactor); 
-LevelsNumb = size(LineLevels, 1); %Число уровней сигнала
-[PartsDisplacement IndexPartsDisplacement] = AssignLevels(Time, Displacement, LineLevels); %Выделение частей перемещений по уровнями
-    %Фрагментация временного сигнала с датчиков ускорений
+LevelsNumb = size(LineLevels, 1); %Р§РёСЃР»Рѕ СѓСЂРѕРІРЅРµР№ СЃРёРіРЅР°Р»Р°
+[PartsDisplacement IndexPartsDisplacement] = AssignLevels(Time, Displacement, LineLevels); %Р’С‹РґРµР»РµРЅРёРµ С‡Р°СЃС‚РµР№ РїРµСЂРµРјРµС‰РµРЅРёР№ РїРѕ СѓСЂРѕРІРЅСЏРјРё
+    %Р¤СЂР°РіРјРµРЅС‚Р°С†РёСЏ РІСЂРµРјРµРЅРЅРѕРіРѕ СЃРёРіРЅР°Р»Р° СЃ РґР°С‚С‡РёРєРѕРІ СѓСЃРєРѕСЂРµРЅРёР№
 for i = 1:LevelsNumb
-    PartsAccel{i} = zeros(size(PartsDisplacement{i})); %Выделение памети под фрагменты ускорений
-    for j = 1:size(PartsDisplacement{i},1) %Массив по числу фрагментов 
-        %Запись фрагментов ускорений по номерам фрагментов перемещений
+    PartsAccel{i} = zeros(size(PartsDisplacement{i})); %Р’С‹РґРµР»РµРЅРёРµ РїР°РјРµС‚Рё РїРѕРґ С„СЂР°РіРјРµРЅС‚С‹ СѓСЃРєРѕСЂРµРЅРёР№
+    for j = 1:size(PartsDisplacement{i},1) %РњР°СЃСЃРёРІ РїРѕ С‡РёСЃР»Сѓ С„СЂР°РіРјРµРЅС‚РѕРІ 
+        %Р—Р°РїРёСЃСЊ С„СЂР°РіРјРµРЅС‚РѕРІ СѓСЃРєРѕСЂРµРЅРёР№ РїРѕ РЅРѕРјРµСЂР°Рј С„СЂР°РіРјРµРЅС‚РѕРІ РїРµСЂРµРјРµС‰РµРЅРёР№
         PartsAccel{i}(j,1) = PartsDisplacement{i}(j,1);
         PartsAccel{i}(j,2) = Accel(PartsAccel{i}(j,1));
         PartsAccel{i}(j,3) = PartsDisplacement{i}(j,3);      
     end
 end
-    %Фрагментация сигнала с датчика ускорений по экспонециальному затуханию
+    %Р¤СЂР°РіРјРµРЅС‚Р°С†РёСЏ СЃРёРіРЅР°Р»Р° СЃ РґР°С‚С‡РёРєР° СѓСЃРєРѕСЂРµРЅРёР№ РїРѕ СЌРєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕРјСѓ Р·Р°С‚СѓС…Р°РЅРёСЋ
 [PartsAccelApproxSpline,TableDecrementVisualize,PartsExpAccel,IndexPartsExpAccel,LimitsExpAccel] = FindExpDecrease(Accel,LimExpAccelLevel,AccuracyExp,FreqDecrement,SampleRate,ModelApprox);
 
-    %Отсечение коротких фрагментов и нахождение производных для ускорений
+    %РћС‚СЃРµС‡РµРЅРёРµ РєРѕСЂРѕС‚РєРёС… С„СЂР°РіРјРµРЅС‚РѕРІ Рё РЅР°С…РѕР¶РґРµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅС‹С… РґР»СЏ СѓСЃРєРѕСЂРµРЅРёР№
 [FixPartsAccel,PartsAccelDerivative, IndexPartsAccel,...
     ~, ~] = FixNormalizeDerivative(PartsAccel, IndexPartsDisplacement, CutProcent, NormalizeMode);
-    %Отсечение коротких фрагментов и нахождение производных для пермещений
+    %РћС‚СЃРµС‡РµРЅРёРµ РєРѕСЂРѕС‚РєРёС… С„СЂР°РіРјРµРЅС‚РѕРІ Рё РЅР°С…РѕР¶РґРµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅС‹С… РґР»СЏ РїРµСЂРјРµС‰РµРЅРёР№
 [FixPartsDisplacement PartsDisplacementDerivative IndexPartsDisplacement,...
     ~, ~] = FixNormalizeDerivative(PartsDisplacement, IndexPartsDisplacement, CutProcent, NormalizeMode);  
-    %Отсечение коротких фрагментов для экспонециального затухания с ускорений
+    %РћС‚СЃРµС‡РµРЅРёРµ РєРѕСЂРѕС‚РєРёС… С„СЂР°РіРјРµРЅС‚РѕРІ РґР»СЏ СЌРєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕРіРѕ Р·Р°С‚СѓС…Р°РЅРёСЏ СЃ СѓСЃРєРѕСЂРµРЅРёР№
 [FixPartsExpAccel, PartsExpAccelDerivative, IndexPartsExpAccel,...
     ~,~] = FixNormalizeDerivative(PartsExpAccel, IndexPartsExpAccel, CutProcent, NormalizeMode);  
 
-    %Выделение одномонотонных фрагментов по перемещениям
+    %Р’С‹РґРµР»РµРЅРёРµ РѕРґРЅРѕРјРѕРЅРѕС‚РѕРЅРЅС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ РїРѕ РїРµСЂРµРјРµС‰РµРЅРёСЏРј
 [PartsMonotoneAccel, IndexMonotoneAccel] = ConstructMonotoneLevels(FixPartsAccel, FixPartsDisplacement, LineLevels);
-    %Отсечение коротких фрагментов и нахождение производных для сигнала
-for s = 1:length(PartsMonotoneAccel) %Цикл по Increase, Neutral, Decrease
+    %РћС‚СЃРµС‡РµРЅРёРµ РєРѕСЂРѕС‚РєРёС… С„СЂР°РіРјРµРЅС‚РѕРІ Рё РЅР°С…РѕР¶РґРµРЅРёРµ РїСЂРѕРёР·РІРѕРґРЅС‹С… РґР»СЏ СЃРёРіРЅР°Р»Р°
+for s = 1:length(PartsMonotoneAccel) %Р¦РёРєР» РїРѕ Increase, Neutral, Decrease
    [FixPartsMonotoneAccel{s},PartsMonotoneAccelDerivative{s},IndexPartsMonotoneAccel{s}...
-       ,~,~] = FixNormalizeDerivative(PartsMonotoneAccel{s}, IndexMonotoneAccel{s}, CutProcent, NormalizeMode); %Усечение и нормализация
+       ,~,~] = FixNormalizeDerivative(PartsMonotoneAccel{s}, IndexMonotoneAccel{s}, CutProcent, NormalizeMode); %РЈСЃРµС‡РµРЅРёРµ Рё РЅРѕСЂРјР°Р»РёР·Р°С†РёСЏ
 end
 
-switch CorrectLengthMode %Режим приведения фрагментов к длине
-    case 'Maximum' %К максимальной
-        MaxLength = 0; %Начальное оценочное значение
-        for i = 1:LevelsNumb %Перемещения и ускорения
-            if length(FixPartsAccel{i}) > MaxLength %Нахождения максимума среди ускорений
+switch CorrectLengthMode %Р РµР¶РёРј РїСЂРёРІРµРґРµРЅРёСЏ С„СЂР°РіРјРµРЅС‚РѕРІ Рє РґР»РёРЅРµ
+    case 'Maximum' %Рљ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№
+        MaxLength = 0; %РќР°С‡Р°Р»СЊРЅРѕРµ РѕС†РµРЅРѕС‡РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
+        for i = 1:LevelsNumb %РџРµСЂРµРјРµС‰РµРЅРёСЏ Рё СѓСЃРєРѕСЂРµРЅРёСЏ
+            if length(FixPartsAccel{i}) > MaxLength %РќР°С…РѕР¶РґРµРЅРёСЏ РјР°РєСЃРёРјСѓРјР° СЃСЂРµРґРё СѓСЃРєРѕСЂРµРЅРёР№
                 MaxLength = length(FixPartsAccel{i});
             end
             if length(FixPartsDisplacement{i}) > MaxLength
-                MaxLength = length(FixPartsDisplacement{i}); %Нахождения максимума среди перемещений
+                MaxLength = length(FixPartsDisplacement{i}); %РќР°С…РѕР¶РґРµРЅРёСЏ РјР°РєСЃРёРјСѓРјР° СЃСЂРµРґРё РїРµСЂРµРјРµС‰РµРЅРёР№
             end
         end
         if length(FixSignalIncrease{1}) > MaxLength
-            MaxLength = length(FixSignalIncrease{1}); %Нахождения максимума среди возрастающих фрагментов
+            MaxLength = length(FixSignalIncrease{1}); %РќР°С…РѕР¶РґРµРЅРёСЏ РјР°РєСЃРёРјСѓРјР° СЃСЂРµРґРё РІРѕР·СЂР°СЃС‚Р°СЋС‰РёС… С„СЂР°РіРјРµРЅС‚РѕРІ
         end
         if length(FixSignalDecrease{1}) > MaxLength
-            MaxLength = length(FixSignalDecrease{1}); %Нахождения максимума среди убывающих фрагментов
+            MaxLength = length(FixSignalDecrease{1}); %РќР°С…РѕР¶РґРµРЅРёСЏ РјР°РєСЃРёРјСѓРјР° СЃСЂРµРґРё СѓР±С‹РІР°СЋС‰РёС… С„СЂР°РіРјРµРЅС‚РѕРІ
         end
-        LengthCorrect = MaxLength; %Общий масимум
+        LengthCorrect = MaxLength; %РћР±С‰РёР№ РјР°СЃРёРјСѓРј
         clear MaxLength;
     case 'Input'
-        LengthCorrect = length(Accel); %Длина ускорений
+        LengthCorrect = length(Accel); %Р”Р»РёРЅР° СѓСЃРєРѕСЂРµРЅРёР№
     case 'No'
         LengthCorrect = 0;   
 end
-    %Склейка фрагментов для каждого уровня ускорений
-[PartsAccelGlued, FailAccelGlued] = OptimalGluing(IndexPartsAccel,FixPartsAccel,PartsAccelDerivative,0.01,DepthGluing); %Ускорения
+    %РЎРєР»РµР№РєР° С„СЂР°РіРјРµРЅС‚РѕРІ РґР»СЏ РєР°Р¶РґРѕРіРѕ СѓСЂРѕРІРЅСЏ СѓСЃРєРѕСЂРµРЅРёР№
+[PartsAccelGlued, FailAccelGlued] = OptimalGluing(IndexPartsAccel,FixPartsAccel,PartsAccelDerivative,0.01,DepthGluing); %РЈСЃРєРѕСЂРµРЅРёСЏ
 
-[FixPartsExpAccelTurn, PartsExpAccelDerivativeTurn] = OverTurnFragments(FixPartsExpAccel,IndexPartsExpAccel,PartsExpAccelDerivative); %Поворот затухания
-[PartsExpAccelGlued, FailExpAccelGlued] = OptimalGluing(IndexPartsExpAccel,FixPartsExpAccelTurn,PartsExpAccelDerivativeTurn,0.01,DepthGluing); %Экспонециальное затухание
-    %Склейка фрагментов монотонных сигналов
-for s = 1:length(FixPartsMonotoneAccel) %Цикл по Increase, Neutral, Decrease
+[FixPartsExpAccelTurn, PartsExpAccelDerivativeTurn] = OverTurnFragments(FixPartsExpAccel,IndexPartsExpAccel,PartsExpAccelDerivative); %РџРѕРІРѕСЂРѕС‚ Р·Р°С‚СѓС…Р°РЅРёСЏ
+[PartsExpAccelGlued, FailExpAccelGlued] = OptimalGluing(IndexPartsExpAccel,FixPartsExpAccelTurn,PartsExpAccelDerivativeTurn,0.01,DepthGluing); %Р­РєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕРµ Р·Р°С‚СѓС…Р°РЅРёРµ
+    %РЎРєР»РµР№РєР° С„СЂР°РіРјРµРЅС‚РѕРІ РјРѕРЅРѕС‚РѕРЅРЅС‹С… СЃРёРіРЅР°Р»РѕРІ
+for s = 1:length(FixPartsMonotoneAccel) %Р¦РёРєР» РїРѕ Increase, Neutral, Decrease
     [PartsMonotoneAccelGlued{s}, FailPartsMonotoneAccelGlued{s}] = OptimalGluing(IndexPartsMonotoneAccel{s}, FixPartsMonotoneAccel{s}, PartsMonotoneAccelDerivative{s}, 0.01, DepthGluing);
 end
-    %Окончательное приведение фрагментов по длине
+    %РћРєРѕРЅС‡Р°С‚РµР»СЊРЅРѕРµ РїСЂРёРІРµРґРµРЅРёРµ С„СЂР°РіРјРµРЅС‚РѕРІ РїРѕ РґР»РёРЅРµ
 PartsAccelGlued = CorrectLength(PartsAccelGlued, LengthCorrect, 0, DepthGluing); 
 PartsExpAccelGlued = CorrectLength(PartsExpAccelGlued, LengthCorrect, 0, DepthGluing);
-for s = 1:length(PartsMonotoneAccelGlued) %Цикл по Increase, Neutral, Decrease
+for s = 1:length(PartsMonotoneAccelGlued) %Р¦РёРєР» РїРѕ Increase, Neutral, Decrease
     PartsMonotoneAccelGlued{s} = CorrectLength(PartsMonotoneAccelGlued{s}, LengthCorrect, 0, DepthGluing);
 end
 
-    %Преобразование Фурье для склееных уровней сигнала
-[SpectrumAccelGluedVisualize, FrequencyAccelGlued] = FindSpectrum(PartsAccelGlued, SampleRate, 0, 'Welch', AccuracySpectrum); %Спектр уровней
-for s = 1:length(PartsMonotoneAccelGlued) %Цикл по Increase, Neutral, Decrease
-    [SpectrumMonotoneAccelGluedVisualize{s}, FrequencyMonotoneAccelGlued{s}] = FindSpectrum(PartsMonotoneAccelGlued{s}, SampleRate, 0, 'Welch', AccuracySpectrum); %Спектр монотонных фрагментов
+    %РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Р¤СѓСЂСЊРµ РґР»СЏ СЃРєР»РµРµРЅС‹С… СѓСЂРѕРІРЅРµР№ СЃРёРіРЅР°Р»Р°
+[SpectrumAccelGluedVisualize, FrequencyAccelGlued] = FindSpectrum(PartsAccelGlued, SampleRate, 0, 'Welch', AccuracySpectrum); %РЎРїРµРєС‚СЂ СѓСЂРѕРІРЅРµР№
+for s = 1:length(PartsMonotoneAccelGlued) %Р¦РёРєР» РїРѕ Increase, Neutral, Decrease
+    [SpectrumMonotoneAccelGluedVisualize{s}, FrequencyMonotoneAccelGlued{s}] = FindSpectrum(PartsMonotoneAccelGlued{s}, SampleRate, 0, 'Welch', AccuracySpectrum); %РЎРїРµРєС‚СЂ РјРѕРЅРѕС‚РѕРЅРЅС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
 end
-[SpectrumExpAccelGluedVisualize, FrequencyExpAccelGlued] = FindSpectrum(PartsExpAccelGlued, SampleRate, 0, 'Welch', AccuracySpectrum); %Спектр экспонецильно затухающих и нулевых фрагментов
+[SpectrumExpAccelGluedVisualize, FrequencyExpAccelGlued] = FindSpectrum(PartsExpAccelGlued, SampleRate, 0, 'Welch', AccuracySpectrum); %РЎРїРµРєС‚СЂ СЌРєСЃРїРѕРЅРµС†РёР»СЊРЅРѕ Р·Р°С‚СѓС…Р°СЋС‰РёС… Рё РЅСѓР»РµРІС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
 
-    %Передача данных в вызывающую программу
-Result{1} = Accel; %Ускорения
-Result{2} = Displacement; %Перемещения
-Result{3} = PartsDisplacement; %Фрагментированные перемещения
-Result{4} = PartsAccelGlued; %Склееные по уровням ускорения
-Result{5} = FrequencyAccelGlued; %Частоты склееных ускорений
-Result{6} = SpectrumAccelGluedVisualize; %Поверхность спектра ускорений
-Result{7} = PartsMonotoneAccelGlued; %Склейка монотонных фрагментов
-Result{8} = FrequencyMonotoneAccelGlued; %Частоты скленных монотонных фрагментов
-Result{9} = SpectrumMonotoneAccelGluedVisualize; %Поверхность спектра монотонных фрагментов
-Result{10} = Time; %Время
-Result{11} = LevelsNumb; %Число уровней
-Result{12} = LineLevels; %Линии уровней
-Result{13} = DisplacementApprox; %Аппроксимированные перемещения
-Result{14} = DisplacementApproxDerivative; %Аппроксимированные производные от перемещений
-Result{15} = PartsExpAccel; %Экспонециально затухающие фрагменты сигнала
-Result{16} = PartsExpAccelGlued; %Склейка экспонециально затухающих фрагментов сигнала  
-Result{17} = LimitsExpAccel; %Лимитирующие пределы затухания
-Result{18} = SpectrumExpAccelGluedVisualize; %Поверхность спектра экспонециально затухающего сигнала 
-Result{19} = FrequencyExpAccelGlued; %Частоты для поверхности спектра экспонециального затухающего сигнала
-Result{20} = TableDecrementVisualize; %Таблица декрементов затухания по пикам
-Result{21} = PartsAccelApproxSpline; %Аппроксимирующие сплайны для каждого пика
+    %РџРµСЂРµРґР°С‡Р° РґР°РЅРЅС‹С… РІ РІС‹Р·С‹РІР°СЋС‰СѓСЋ РїСЂРѕРіСЂР°РјРјСѓ
+Result{1} = Accel; %РЈСЃРєРѕСЂРµРЅРёСЏ
+Result{2} = Displacement; %РџРµСЂРµРјРµС‰РµРЅРёСЏ
+Result{3} = PartsDisplacement; %Р¤СЂР°РіРјРµРЅС‚РёСЂРѕРІР°РЅРЅС‹Рµ РїРµСЂРµРјРµС‰РµРЅРёСЏ
+Result{4} = PartsAccelGlued; %РЎРєР»РµРµРЅС‹Рµ РїРѕ СѓСЂРѕРІРЅСЏРј СѓСЃРєРѕСЂРµРЅРёСЏ
+Result{5} = FrequencyAccelGlued; %Р§Р°СЃС‚РѕС‚С‹ СЃРєР»РµРµРЅС‹С… СѓСЃРєРѕСЂРµРЅРёР№
+Result{6} = SpectrumAccelGluedVisualize; %РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ СЃРїРµРєС‚СЂР° СѓСЃРєРѕСЂРµРЅРёР№
+Result{7} = PartsMonotoneAccelGlued; %РЎРєР»РµР№РєР° РјРѕРЅРѕС‚РѕРЅРЅС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
+Result{8} = FrequencyMonotoneAccelGlued; %Р§Р°СЃС‚РѕС‚С‹ СЃРєР»РµРЅРЅС‹С… РјРѕРЅРѕС‚РѕРЅРЅС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
+Result{9} = SpectrumMonotoneAccelGluedVisualize; %РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ СЃРїРµРєС‚СЂР° РјРѕРЅРѕС‚РѕРЅРЅС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
+Result{10} = Time; %Р’СЂРµРјСЏ
+Result{11} = LevelsNumb; %Р§РёСЃР»Рѕ СѓСЂРѕРІРЅРµР№
+Result{12} = LineLevels; %Р›РёРЅРёРё СѓСЂРѕРІРЅРµР№
+Result{13} = DisplacementApprox; %РђРїРїСЂРѕРєСЃРёРјРёСЂРѕРІР°РЅРЅС‹Рµ РїРµСЂРµРјРµС‰РµРЅРёСЏ
+Result{14} = DisplacementApproxDerivative; %РђРїРїСЂРѕРєСЃРёРјРёСЂРѕРІР°РЅРЅС‹Рµ РїСЂРѕРёР·РІРѕРґРЅС‹Рµ РѕС‚ РїРµСЂРµРјРµС‰РµРЅРёР№
+Result{15} = PartsExpAccel; %Р­РєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕ Р·Р°С‚СѓС…Р°СЋС‰РёРµ С„СЂР°РіРјРµРЅС‚С‹ СЃРёРіРЅР°Р»Р°
+Result{16} = PartsExpAccelGlued; %РЎРєР»РµР№РєР° СЌРєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕ Р·Р°С‚СѓС…Р°СЋС‰РёС… С„СЂР°РіРјРµРЅС‚РѕРІ СЃРёРіРЅР°Р»Р°  
+Result{17} = LimitsExpAccel; %Р›РёРјРёС‚РёСЂСѓСЋС‰РёРµ РїСЂРµРґРµР»С‹ Р·Р°С‚СѓС…Р°РЅРёСЏ
+Result{18} = SpectrumExpAccelGluedVisualize; %РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ СЃРїРµРєС‚СЂР° СЌРєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕ Р·Р°С‚СѓС…Р°СЋС‰РµРіРѕ СЃРёРіРЅР°Р»Р° 
+Result{19} = FrequencyExpAccelGlued; %Р§Р°СЃС‚РѕС‚С‹ РґР»СЏ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё СЃРїРµРєС‚СЂР° СЌРєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕРіРѕ Р·Р°С‚СѓС…Р°СЋС‰РµРіРѕ СЃРёРіРЅР°Р»Р°
+Result{20} = TableDecrementVisualize; %РўР°Р±Р»РёС†Р° РґРµРєСЂРµРјРµРЅС‚РѕРІ Р·Р°С‚СѓС…Р°РЅРёСЏ РїРѕ РїРёРєР°Рј
+Result{21} = PartsAccelApproxSpline; %РђРїРїСЂРѕРєСЃРёРјРёСЂСѓСЋС‰РёРµ СЃРїР»Р°Р№РЅС‹ РґР»СЏ РєР°Р¶РґРѕРіРѕ РїРёРєР°
 
 % return;
-%% Отладка
+%% РћС‚Р»Р°РґРєР°
 
 % TimeInput = FrequencyExpAccelGlued;
 % TimeInterpolate = FrequencyAccelGlued;
 % Signal = SpectrumExpAccelGluedVisualize(:,1);
-% [SignalApprox,~] = ApproxSpline(TimeInput, TimeInterpolate, Signal, 1, 0); %Вычисление значений функции для заданного дискретного набора точек
+% [SignalApprox,~] = ApproxSpline(TimeInput, TimeInterpolate, Signal, 1, 0); %Р’С‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ С„СѓРЅРєС†РёРё РґР»СЏ Р·Р°РґР°РЅРЅРѕРіРѕ РґРёСЃРєСЂРµС‚РЅРѕРіРѕ РЅР°Р±РѕСЂР° С‚РѕС‡РµРє
 % plot(TimeInput, Signal);
 % grid on; hold on;
 % plot(TimeInterpolate, SignalApprox);
@@ -223,13 +223,13 @@ Result{21} = PartsAccelApproxSpline; %Аппроксимирующие сплайны для каждого пика
 % grid on;
 % plot(Accel);
 % 
-% figure %Перемещения
-% hold on; %Построение графиков в одних осях
-% plot(Time, Displacement); %Построение графика сигнала
-% grid on; %Отображение масштабной сетки
-% title('Временной сигнал перемещений'); %Название графика
-% xlabel('t'); ylabel('r'); %Название осей
-% for i = 1:length(LineLevels) %Построение горизонтальных линий
+% figure %РџРµСЂРµРјРµС‰РµРЅРёСЏ
+% hold on; %РџРѕСЃС‚СЂРѕРµРЅРёРµ РіСЂР°С„РёРєРѕРІ РІ РѕРґРЅРёС… РѕСЃСЏС…
+% plot(Time, Displacement); %РџРѕСЃС‚СЂРѕРµРЅРёРµ РіСЂР°С„РёРєР° СЃРёРіРЅР°Р»Р°
+% grid on; %РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РјР°СЃС€С‚Р°Р±РЅРѕР№ СЃРµС‚РєРё
+% title('Р’СЂРµРјРµРЅРЅРѕР№ СЃРёРіРЅР°Р» РїРµСЂРµРјРµС‰РµРЅРёР№'); %РќР°Р·РІР°РЅРёРµ РіСЂР°С„РёРєР°
+% xlabel('t'); ylabel('r'); %РќР°Р·РІР°РЅРёРµ РѕСЃРµР№
+% for i = 1:length(LineLevels) %РџРѕСЃС‚СЂРѕРµРЅРёРµ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹С… Р»РёРЅРёР№
 %     for j = 1:2
 %         X = [0 length(Signal)]; Y = LineLevels(i,j);
 %         if ~mod(LineLevels(i,3),2)
@@ -240,44 +240,44 @@ Result{21} = PartsAccelApproxSpline; %Аппроксимирующие сплайны для каждого пика
 %         
 %     end
 % end
-% %Подпись уровней
+% %РџРѕРґРїРёСЃСЊ СѓСЂРѕРІРЅРµР№
 % for i = 1:length(LineLevels)
-%     text(X(2),mean(LineLevels(i,1:2)),num2str(LineLevels(i,3)),'FontSize',12); %Номера уровней
+%     text(X(2),mean(LineLevels(i,1:2)),num2str(LineLevels(i,3)),'FontSize',12); %РќРѕРјРµСЂР° СѓСЂРѕРІРЅРµР№
 % end
 % 
-% figure %Фрагменты перемещений
-% plot(PartsDisplacement{ShowNumb}(:,1),PartsDisplacement{ShowNumb}(:,2),'.'); %Построение графика
-% grid on; %Отображение масштабной сетки
-% title(['Фрагментированный по уровню №' num2str(ShowNumb) ' график перемещений']); %Название графика
-% xlabel('t'); ylabel('r'); %Название осей
+% figure %Р¤СЂР°РіРјРµРЅС‚С‹ РїРµСЂРµРјРµС‰РµРЅРёР№
+% plot(PartsDisplacement{ShowNumb}(:,1),PartsDisplacement{ShowNumb}(:,2),'.'); %РџРѕСЃС‚СЂРѕРµРЅРёРµ РіСЂР°С„РёРєР°
+% grid on; %РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РјР°СЃС€С‚Р°Р±РЅРѕР№ СЃРµС‚РєРё
+% title(['Р¤СЂР°РіРјРµРЅС‚РёСЂРѕРІР°РЅРЅС‹Р№ РїРѕ СѓСЂРѕРІРЅСЋ в„–' num2str(ShowNumb) ' РіСЂР°С„РёРє РїРµСЂРµРјРµС‰РµРЅРёР№']); %РќР°Р·РІР°РЅРёРµ РіСЂР°С„РёРєР°
+% xlabel('t'); ylabel('r'); %РќР°Р·РІР°РЅРёРµ РѕСЃРµР№
 % 
 % 
-% figure %Склейка ускорений
-% plot(PartsAccelGlued{ShowNumb}(:,2)); %Построение графика
-% grid on; %Отображение масштабной сетки
+% figure %РЎРєР»РµР№РєР° СѓСЃРєРѕСЂРµРЅРёР№
+% plot(PartsAccelGlued{ShowNumb}(:,2)); %РџРѕСЃС‚СЂРѕРµРЅРёРµ РіСЂР°С„РёРєР°
+% grid on; %РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РјР°СЃС€С‚Р°Р±РЅРѕР№ СЃРµС‚РєРё
 % DotGluedShow = find(PartsAccelGlued{ShowNumb}(:,3) == 1);
-% DotGluedShow(end) = []; %Обнудением последнего значения (конец сигнала
+% DotGluedShow(end) = []; %РћР±РЅСѓРґРµРЅРёРµРј РїРѕСЃР»РµРґРЅРµРіРѕ Р·РЅР°С‡РµРЅРёСЏ (РєРѕРЅРµС† СЃРёРіРЅР°Р»Р°
 % hold on
 % plot(DotGluedShow,PartsAccelGlued{ShowNumb}(DotGluedShow,2),'*','Color','Red');
 % plot(DotGluedShow+1,PartsAccelGlued{ShowNumb}(DotGluedShow+1,2),'*','Color','black');
-% title(['Склееный по уровню №' num2str(ShowNumb) ' график ускоерний']); %Название графика
-% xlabel('t'); ylabel('r"'); %Название осей
+% title(['РЎРєР»РµРµРЅС‹Р№ РїРѕ СѓСЂРѕРІРЅСЋ в„–' num2str(ShowNumb) ' РіСЂР°С„РёРє СѓСЃРєРѕРµСЂРЅРёР№']); %РќР°Р·РІР°РЅРёРµ РіСЂР°С„РёРєР°
+% xlabel('t'); ylabel('r"'); %РќР°Р·РІР°РЅРёРµ РѕСЃРµР№
 % 
-% figure %Построение экспонециально убывающих и нулевых фрагментов
+% figure %РџРѕСЃС‚СЂРѕРµРЅРёРµ СЌРєСЃРїРѕРЅРµС†РёР°Р»СЊРЅРѕ СѓР±С‹РІР°СЋС‰РёС… Рё РЅСѓР»РµРІС‹С… С„СЂР°РіРјРµРЅС‚РѕРІ
 % hold on; grid on
 % plot(PartsExpAccel{1}(:,1),PartsExpAccel{1}(:,2),'*','Color','blue');
 % plot(PartsExpAccel{2}(:,1),PartsExpAccel{2}(:,2),'*','Color','red');
 % plot([0 length(Accel)],[LimitsExpAccel(1) LimitsExpAccel(1)],'--','Color','black','LineWidth',1.5);
 % plot([0 length(Accel)],[LimitsExpAccel(2) LimitsExpAccel(2)],'--','Color','black','LineWidth',1.5);
-% legend('Убывающие фрагменты','Нулевые фрагменты','Лимитирующая граница');
+% legend('РЈР±С‹РІР°СЋС‰РёРµ С„СЂР°РіРјРµРЅС‚С‹','РќСѓР»РµРІС‹Рµ С„СЂР°РіРјРµРЅС‚С‹','Р›РёРјРёС‚РёСЂСѓСЋС‰Р°СЏ РіСЂР°РЅРёС†Р°');
 % figure
-% plot(PartsExpAccelGlued{1}(:,2)); %Убывающие склееные
+% plot(PartsExpAccelGlued{1}(:,2)); %РЈР±С‹РІР°СЋС‰РёРµ СЃРєР»РµРµРЅС‹Рµ
 % DotGluedShow = find(PartsExpAccelGlued{1}(:,3) == 1);
-% DotGluedShow(end) = []; %Обнудением последнего значения (конец сигнала
+% DotGluedShow(end) = []; %РћР±РЅСѓРґРµРЅРёРµРј РїРѕСЃР»РµРґРЅРµРіРѕ Р·РЅР°С‡РµРЅРёСЏ (РєРѕРЅРµС† СЃРёРіРЅР°Р»Р°
 % hold on
 % plot(DotGluedShow,PartsExpAccelGlued{1}(DotGluedShow,2),'*');
 % plot(DotGluedShow+1,PartsExpAccelGlued{1}(DotGluedShow+1,2),'*','Color','black');
 % figure
-% plot(PartsExpAccelGlued{2}(:,2)); %Нулевые склееные
+% plot(PartsExpAccelGlued{2}(:,2)); %РќСѓР»РµРІС‹Рµ СЃРєР»РµРµРЅС‹Рµ
 
 end

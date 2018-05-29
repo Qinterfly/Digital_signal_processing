@@ -1,21 +1,21 @@
 function [SignalSecondIntegralOutput] = DoubleIntegral(Time, Signal, CutOffFrequency, SampleRate)
-%Двойное интегрирование исходного сигнала c выделением высоких частот
+%Р”РІРѕР№РЅРѕРµ РёРЅС‚РµРіСЂРёСЂРѕРІР°РЅРёРµ РёСЃС…РѕРґРЅРѕРіРѕ СЃРёРіРЅР°Р»Р° c РІС‹РґРµР»РµРЅРёРµРј РІС‹СЃРѕРєРёС… С‡Р°СЃС‚РѕС‚
 
-PolyDegree = 20; %Степень интерполирующего среднюю линию полинома
-    %Первый интеграл
-SignalFirstIntegral = cumsum(Signal); %Вычисление первого интеграла по методу трапеций
-MeanLineCoeffs = polyfit(Time,SignalFirstIntegral,PolyDegree); %Нахождение коэффициентов интерполирующего полинома
-MeanLine = polyval(MeanLineCoeffs,Time); %Нахождение средней линии по коэффициентам полинома
-SignalFirstIntegralHighFreq = SignalFirstIntegral - MeanLine; %Отсечение низкочастотной составляющей для первого интеграла
-SignalFirstIntegralHighFreq = SignalFirstIntegralHighFreq - SignalFirstIntegralHighFreq(1); %Смещение интеграла к нулевой линии
-    %Второй интеграл
-SignalSecondIntegral = cumtrapz(SignalFirstIntegralHighFreq); %Второе интегрирование сигнала
-if isempty(CutOffFrequency) || CutOffFrequency == 0 %Проверка наличия фильтра
-    SignalSecondIntegralOutput = SignalSecondIntegral; %Сохраняем сигнала без фильтра
+PolyDegree = 20; %РЎС‚РµРїРµРЅСЊ РёРЅС‚РµСЂРїРѕР»РёСЂСѓСЋС‰РµРіРѕ СЃСЂРµРґРЅСЋСЋ Р»РёРЅРёСЋ РїРѕР»РёРЅРѕРјР°
+    %РџРµСЂРІС‹Р№ РёРЅС‚РµРіСЂР°Р»
+SignalFirstIntegral = cumsum(Signal); %Р’С‹С‡РёСЃР»РµРЅРёРµ РїРµСЂРІРѕРіРѕ РёРЅС‚РµРіСЂР°Р»Р° РїРѕ РјРµС‚РѕРґСѓ С‚СЂР°РїРµС†РёР№
+MeanLineCoeffs = polyfit(Time,SignalFirstIntegral,PolyDegree); %РќР°С…РѕР¶РґРµРЅРёРµ РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ РёРЅС‚РµСЂРїРѕР»РёСЂСѓСЋС‰РµРіРѕ РїРѕР»РёРЅРѕРјР°
+MeanLine = polyval(MeanLineCoeffs,Time); %РќР°С…РѕР¶РґРµРЅРёРµ СЃСЂРµРґРЅРµР№ Р»РёРЅРёРё РїРѕ РєРѕСЌС„С„РёС†РёРµРЅС‚Р°Рј РїРѕР»РёРЅРѕРјР°
+SignalFirstIntegralHighFreq = SignalFirstIntegral - MeanLine; %РћС‚СЃРµС‡РµРЅРёРµ РЅРёР·РєРѕС‡Р°СЃС‚РѕС‚РЅРѕР№ СЃРѕСЃС‚Р°РІР»СЏСЋС‰РµР№ РґР»СЏ РїРµСЂРІРѕРіРѕ РёРЅС‚РµРіСЂР°Р»Р°
+SignalFirstIntegralHighFreq = SignalFirstIntegralHighFreq - SignalFirstIntegralHighFreq(1); %РЎРјРµС‰РµРЅРёРµ РёРЅС‚РµРіСЂР°Р»Р° Рє РЅСѓР»РµРІРѕР№ Р»РёРЅРёРё
+    %Р’С‚РѕСЂРѕР№ РёРЅС‚РµРіСЂР°Р»
+SignalSecondIntegral = cumtrapz(SignalFirstIntegralHighFreq); %Р’С‚РѕСЂРѕРµ РёРЅС‚РµРіСЂРёСЂРѕРІР°РЅРёРµ СЃРёРіРЅР°Р»Р°
+if isempty(CutOffFrequency) || CutOffFrequency == 0 %РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С„РёР»СЊС‚СЂР°
+    SignalSecondIntegralOutput = SignalSecondIntegral; %РЎРѕС…СЂР°РЅСЏРµРј СЃРёРіРЅР°Р»Р° Р±РµР· С„РёР»СЊС‚СЂР°
 else
-    CutOffFrequencyFilter = CutOffFrequency*200; %Частота сигнала для фильтрации
-    [b, a] = butter(4,CutOffFrequencyFilter/(SampleRate/2),'high'); %Параметры фильтрации ФВЧ Баттерворта
-    SignalSecondIntegralOutput = filter(b,a,SignalSecondIntegral); %Применение фильтра
+    CutOffFrequencyFilter = CutOffFrequency*200; %Р§Р°СЃС‚РѕС‚Р° СЃРёРіРЅР°Р»Р° РґР»СЏ С„РёР»СЊС‚СЂР°С†РёРё
+    [b, a] = butter(4,CutOffFrequencyFilter/(SampleRate/2),'high'); %РџР°СЂР°РјРµС‚СЂС‹ С„РёР»СЊС‚СЂР°С†РёРё Р¤Р’Р§ Р‘Р°С‚С‚РµСЂРІРѕСЂС‚Р°
+    SignalSecondIntegralOutput = filter(b,a,SignalSecondIntegral); %РџСЂРёРјРµРЅРµРЅРёРµ С„РёР»СЊС‚СЂР°
 end
 end
 

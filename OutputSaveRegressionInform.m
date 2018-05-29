@@ -1,66 +1,66 @@
 function OutputSaveRegressionInform(RegressionTable, Title, FileName, TechnicalData, Path, InputFileName)
-%Сохранение результатов спектрального расчёта в виде таблиц в .xls формате
-%одним вызовом COM сервера Excel
+%РЎРѕС…СЂР°РЅРµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ СЂРµРіСЂРµСЃСЃРёРѕРЅРіРѕ СЂР°СЃС‡С‘С‚Р° РІ РІРёРґРµ С‚Р°Р±Р»РёС† РІ .xls С„РѕСЂРјР°С‚Рµ c
+%Р·Р°РєР»Р°РґРєР°РјРё
 
-%Запись пути сохранения
-Path = strcat(Path,'\Результаты\',InputFileName);
-if ~isdir(Path) %Создание директории для данного сигнала
+%Р—Р°РїРёСЃСЊ РїСѓС‚Рё СЃРѕС…СЂР°РЅРµРЅРёСЏ
+Path = strcat(Path,'\Р РµР·СѓР»СЊС‚Р°С‚С‹\',InputFileName);
+if ~isdir(Path) %РЎРѕР·РґР°РЅРёРµ РґРёСЂРµРєС‚РѕСЂРёРё РґР»СЏ РґР°РЅРЅРѕРіРѕ СЃРёРіРЅР°Р»Р°
    mkdir(Path);  
 end
-FullFileName = strcat(Path,'/',FileName,'.xls'); %Полное имя файла
-if exist(FullFileName) == 2 %Проверка существования файла
-   delete(FullFileName); %Удаление
+FullFileName = strcat(Path,'/',FileName,'.xls'); %РџРѕР»РЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°
+if exist(FullFileName) == 2 %РџСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»Р°
+   delete(FullFileName); %РЈРґР°Р»РµРЅРёРµ
 end
-SpreadSheet = {'Технические сведения', 'Угловой коэффициент',... 
-              'Дистанция рассеяния', 'Длина кривой', 'Амплитуда', 'Максимальная частота'}; %Название рабочей страницы страницы
-%Создание заголовков колонок
-k = 1; %Начальное значение итератора
+SpreadSheet = {'РўРµС…РЅРёС‡РµСЃРєРёРµ СЃРІРµРґРµРЅРёСЏ', 'РЈРіР»РѕРІРѕР№ РєРѕСЌС„С„РёС†РёРµРЅС‚',... 
+              'Р”РёСЃС‚Р°РЅС†РёСЏ СЂР°СЃСЃРµСЏРЅРёСЏ', 'Р”Р»РёРЅР° РєСЂРёРІРѕР№', 'РђРјРїР»РёС‚СѓРґР°', 'РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ С‡Р°СЃС‚РѕС‚Р°'}; %РќР°Р·РІР°РЅРёРµ СЂР°Р±РѕС‡РµР№ СЃС‚СЂР°РЅРёС†С‹ СЃС‚СЂР°РЅРёС†С‹
+%РЎРѕР·РґР°РЅРёРµ Р·Р°РіРѕР»РѕРІРєРѕРІ РєРѕР»РѕРЅРѕРє
+k = 1; %РќР°С‡Р°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 for i = double('A'):double('Z')
-    XlRangeBase{k} = char(i); % A - Z алфавит
-    k = k + 1; %Приращение итератора
+    XlRangeBase{k} = char(i); % A - Z Р°Р»С„Р°РІРёС‚
+    k = k + 1; %РџСЂРёСЂР°С‰РµРЅРёРµ РёС‚РµСЂР°С‚РѕСЂР°
 end
 TempLen = length(XlRangeBase);
-    %Вариации названий колонок
+    %Р’Р°СЂРёР°С†РёРё РЅР°Р·РІР°РЅРёР№ РєРѕР»РѕРЅРѕРє
 for i = 1:TempLen
    for j = 1:TempLen
-       XlRangeBase{end + 1} = strcat(XlRangeBase{i}, XlRangeBase{j}); %AA - ZZ вариации
+       XlRangeBase{end + 1} = strcat(XlRangeBase{i}, XlRangeBase{j}); %AA - ZZ РІР°СЂРёР°С†РёРё
    end
 end
-%Запись шаблонов таблиц 
+%Р—Р°РїРёСЃСЊ С€Р°Р±Р»РѕРЅРѕРІ С‚Р°Р±Р»РёС† 
 TitleMask{1,1} = '\'; %Placeholder
 for i = 1:length(Title.Rows)
-    TitleMask{1+i,1} = Title.Rows{i}; %По строкам
+    TitleMask{1+i,1} = Title.Rows{i}; %РџРѕ СЃС‚СЂРѕРєР°Рј
 end
 for j = 1:length(Title.Cols)
-    TitleMask{1,1+j} = Title.Cols{j}; %По столбцам
+    TitleMask{1,1+j} = Title.Cols{j}; %РџРѕ СЃС‚РѕР»Р±С†Р°Рј
 end
-BeginTitleInd = [2, 2]; %Индексы начала основных данных (строка, столбец)
-ElementNumb = length(RegressionTable); %Число регрессионных параметров
-%Формирование таблиц параметров регрессии к записи
+BeginTitleInd = [2, 2]; %РРЅРґРµРєСЃС‹ РЅР°С‡Р°Р»Р° РѕСЃРЅРѕРІРЅС‹С… РґР°РЅРЅС‹С… (СЃС‚СЂРѕРєР°, СЃС‚РѕР»Р±РµС†)
+ElementNumb = length(RegressionTable); %Р§РёСЃР»Рѕ СЂРµРіСЂРµСЃСЃРёРѕРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
+%Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ С‚Р°Р±Р»РёС† РїР°СЂР°РјРµС‚СЂРѕРІ СЂРµРіСЂРµСЃСЃРёРё Рє Р·Р°РїРёСЃРё
 for s = 1:length(RegressionTable)
-    LevelsNumb{s} = size(RegressionTable{s}); %Число уровней по строкам и столбцам для каждого параметра
+    LevelsNumb{s} = size(RegressionTable{s}); %Р§РёСЃР»Рѕ СѓСЂРѕРІРЅРµР№ РїРѕ СЃС‚СЂРѕРєР°Рј Рё СЃС‚РѕР»Р±С†Р°Рј РґР»СЏ РєР°Р¶РґРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
 end
 for p = 1:ElementNumb
     if ~isvector(RegressionTable{p})
-        ResTable{p} = TitleMask; %Запись шаблона таблицы
+        ResTable{p} = TitleMask; %Р—Р°РїРёСЃСЊ С€Р°Р±Р»РѕРЅР° С‚Р°Р±Р»РёС†С‹
     else
-        ResTable{p} = TitleMask(:,1); %Запись шаблона вектора
+        ResTable{p} = TitleMask(:,1); %Р—Р°РїРёСЃСЊ С€Р°Р±Р»РѕРЅР° РІРµРєС‚РѕСЂР°
     end
 end
-%Запись числовых значений
-for s = 1:ElementNumb %Цикл по числу параметров
-    for i = 1:LevelsNumb{s}(1) %Циклы по размерностям уровней
+%Р—Р°РїРёСЃСЊ С‡РёСЃР»РѕРІС‹С… Р·РЅР°С‡РµРЅРёР№
+for s = 1:ElementNumb %Р¦РёРєР» РїРѕ С‡РёСЃР»Сѓ РїР°СЂР°РјРµС‚СЂРѕРІ
+    for i = 1:LevelsNumb{s}(1) %Р¦РёРєР»С‹ РїРѕ СЂР°Р·РјРµСЂРЅРѕСЃС‚СЏРј СѓСЂРѕРІРЅРµР№
         for j = 1:LevelsNumb{s}(2)
-            OriginalData = RegressionTable{s}(i,j); %Неформатированная строка с данными
-            Pointer = [BeginTitleInd(1)+i-1, BeginTitleInd(2)+j-1]; %Указатель на позицию записи
-            ResTable{s}{Pointer(1),Pointer(2)} = strrep(num2str(OriginalData),'.',','); %Запись значения
+            OriginalData = RegressionTable{s}(i,j); %РќРµС„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРЅР°СЏ СЃС‚СЂРѕРєР° СЃ РґР°РЅРЅС‹РјРё
+            Pointer = [BeginTitleInd(1)+i-1, BeginTitleInd(2)+j-1]; %РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РїРѕР·РёС†РёСЋ Р·Р°РїРёСЃРё
+            ResTable{s}{Pointer(1),Pointer(2)} = strrep(num2str(OriginalData),'.',','); %Р—Р°РїРёСЃСЊ Р·РЅР°С‡РµРЅРёСЏ
         end
     end
 end
-%Сохранение таблиц
-xlswrite(FullFileName, TechnicalData, SpreadSheet{1}); %Таблица технических сведений
+%РЎРѕС…СЂР°РЅРµРЅРёРµ С‚Р°Р±Р»РёС†
+xlswrite(FullFileName, TechnicalData, SpreadSheet{1}); %РўР°Р±Р»РёС†Р° С‚РµС…РЅРёС‡РµСЃРєРёС… СЃРІРµРґРµРЅРёР№
 for s = 1:ElementNumb
-    xlswrite(FullFileName, ResTable{s}, SpreadSheet{s+1}); %Запись результирующих таблиц
+    xlswrite(FullFileName, ResTable{s}, SpreadSheet{s+1}); %Р—Р°РїРёСЃСЊ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РёС… С‚Р°Р±Р»РёС†
 end
 
 end

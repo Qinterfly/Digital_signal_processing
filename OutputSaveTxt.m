@@ -1,21 +1,21 @@
 function OutputSaveTxt(OutputSignal, FileName, TechnicalData, Path, InputFileName)
-%Сохранение выходных файлов, датированных днём записи исходного сигнала
+%РЎРѕС…СЂР°РЅРµРЅРёРµ РІС‹С…РѕРґРЅС‹С… С„Р°Р№Р»РѕРІ, РґР°С‚РёСЂРѕРІР°РЅРЅС‹С… РґРЅС‘Рј Р·Р°РїРёСЃРё РёСЃС…РѕРґРЅРѕРіРѕ СЃРёРіРЅР°Р»Р°
 
-Path = strcat(Path,'\Результаты\',InputFileName);
-if ~isdir(Path) %Создание директории для данного сигнала
+Path = strcat(Path,'\Р РµР·СѓР»СЊС‚Р°С‚С‹\',InputFileName);
+if ~isdir(Path) %РЎРѕР·РґР°РЅРёРµ РґРёСЂРµРєС‚РѕСЂРёРё РґР»СЏ РґР°РЅРЅРѕРіРѕ СЃРёРіРЅР°Р»Р°
    mkdir(Path);  
 end
-fileID = fopen(strcat(Path,'/',FileName,'.txt'),'w'); %Открытие файла для записи
-TechnicalData{end} = num2str(size(OutputSignal,1)); %Запись в технические сведения реальной длины выходного сигнала
+fileID = fopen(strcat(Path,'/',FileName,'.txt'),'w'); %РћС‚РєСЂС‹С‚РёРµ С„Р°Р№Р»Р° РґР»СЏ Р·Р°РїРёСЃРё
+TechnicalData{end} = num2str(size(OutputSignal,1)); %Р—Р°РїРёСЃСЊ РІ С‚РµС…РЅРёС‡РµСЃРєРёРµ СЃРІРµРґРµРЅРёСЏ СЂРµР°Р»СЊРЅРѕР№ РґР»РёРЅС‹ РІС‹С…РѕРґРЅРѕРіРѕ СЃРёРіРЅР°Р»Р°
 for i = 1:length(TechnicalData)
-    fprintf(fileID,'%s \r\n',TechnicalData{i}); %Запись технических сведений
+    fprintf(fileID,'%s \r\n',TechnicalData{i}); %Р—Р°РїРёСЃСЊ С‚РµС…РЅРёС‡РµСЃРєРёС… СЃРІРµРґРµРЅРёР№
 end
-formatSpec = '%f \r\n'; %Формат записи значений
+formatSpec = '%f \r\n'; %Р¤РѕСЂРјР°С‚ Р·Р°РїРёСЃРё Р·РЅР°С‡РµРЅРёР№
 if size(OutputSignal,2) > 1
     dlmwrite(strcat(Path,'/',FileName,'.txt'),OutputSignal,'-append','delimiter','\t','newline','pc');    
 else
-    fprintf(fileID,formatSpec,OutputSignal); %Запись сигнала с уровня
+    fprintf(fileID,formatSpec,OutputSignal); %Р—Р°РїРёСЃСЊ СЃРёРіРЅР°Р»Р° СЃ СѓСЂРѕРІРЅСЏ
 end
-fclose(fileID); %Закрытие файла
+fclose(fileID); %Р—Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р°
 end
 

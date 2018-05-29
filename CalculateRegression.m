@@ -1,100 +1,100 @@
 function [RegressionTable, Title] = CalculateRegression(InputAccel, Accel, MonotoneAccel, ExpAccel, FrequencyInputAccel, FrequencyAccel, FrequencyMonotoneAccel, FrequencyExpAccel, RegressionArg, CurrentLevels)
-%Создание таблицы регрессионных коэффициентов по заданным аргументам.
+%РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ СЂРµРіСЂРµСЃСЃРёРѕРЅРЅС‹С… РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ РїРѕ Р·Р°РґР°РЅРЅС‹Рј Р°СЂРіСѓРјРµРЅС‚Р°Рј.
 
-ComplexTableSignal = []; Title.Rows = {}; Title.Cols = {}; %Таблица сигналов и заголовков по всем уровням
-ParamsNumb.Full = 3; %Число параметров для табличного анализа
-ParamsNumb.Vec = 2; %Число параметров для векторного анализа
+ComplexTableSignal = []; Title.Rows = {}; Title.Cols = {}; %РўР°Р±Р»РёС†Р° СЃРёРіРЅР°Р»РѕРІ Рё Р·Р°РіРѕР»РѕРІРєРѕРІ РїРѕ РІСЃРµРј СѓСЂРѕРІРЅСЏРј
+ParamsNumb.Full = 3; %Р§РёСЃР»Рѕ РїР°СЂР°РјРµС‚СЂРѕРІ РґР»СЏ С‚Р°Р±Р»РёС‡РЅРѕРіРѕ Р°РЅР°Р»РёР·Р°
+ParamsNumb.Vec = 2; %Р§РёСЃР»Рѕ РїР°СЂР°РјРµС‚СЂРѕРІ РґР»СЏ РІРµРєС‚РѕСЂРЅРѕРіРѕ Р°РЅР°Р»РёР·Р°
 
-%Составление массива сигналов по маске
+%РЎРѕСЃС‚Р°РІР»РµРЅРёРµ РјР°СЃСЃРёРІР° СЃРёРіРЅР°Р»РѕРІ РїРѕ РјР°СЃРєРµ
 try
 for i = 1:length(RegressionArg)
     switch RegressionArg{i}
-        case 'НУ' %Ускорения исходные
-            ComplexTableSignal = [ComplexTableSignal, InputAccel]; %Добавление ускорений по уровням
-            Title.Rows = [Title.Rows, CreateTitleNameByID(0, RegressionArg{i})]; %Заголовки по строкам
-        case 'У' %Ускорения по уровням
+        case 'РќРЈ' %РЈСЃРєРѕСЂРµРЅРёСЏ РёСЃС…РѕРґРЅС‹Рµ
+            ComplexTableSignal = [ComplexTableSignal, InputAccel]; %Р”РѕР±Р°РІР»РµРЅРёРµ СѓСЃРєРѕСЂРµРЅРёР№ РїРѕ СѓСЂРѕРІРЅСЏРј
+            Title.Rows = [Title.Rows, CreateTitleNameByID(0, RegressionArg{i})]; %Р—Р°РіРѕР»РѕРІРєРё РїРѕ СЃС‚СЂРѕРєР°Рј
+        case 'РЈ' %РЈСЃРєРѕСЂРµРЅРёСЏ РїРѕ СѓСЂРѕРІРЅСЏРј
             for j = 1:size(MonotoneAccel{1},2)
-                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyAccel, FrequencyInputAccel, Accel(:,j), 1, 0)]; %Аппроксимация спектров на сетке ускорений
+                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyAccel, FrequencyInputAccel, Accel(:,j), 1, 0)]; %РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ СЃРїРµРєС‚СЂРѕРІ РЅР° СЃРµС‚РєРµ СѓСЃРєРѕСЂРµРЅРёР№
             end
-            Title.Rows = [Title.Rows, CreateTitleNameByID(CurrentLevels, RegressionArg{i})]; %Заголовки по строкам
-        case 'УВ' %Ускорения возрастающие
+            Title.Rows = [Title.Rows, CreateTitleNameByID(CurrentLevels, RegressionArg{i})]; %Р—Р°РіРѕР»РѕРІРєРё РїРѕ СЃС‚СЂРѕРєР°Рј
+        case 'РЈР’' %РЈСЃРєРѕСЂРµРЅРёСЏ РІРѕР·СЂР°СЃС‚Р°СЋС‰РёРµ
             for j = 1:size(MonotoneAccel{1},2)
-                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyMonotoneAccel{1}, FrequencyInputAccel, MonotoneAccel{1}(:,j), 1, 0)]; %Аппроксимация спектров на сетке ускорений
+                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyMonotoneAccel{1}, FrequencyInputAccel, MonotoneAccel{1}(:,j), 1, 0)]; %РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ СЃРїРµРєС‚СЂРѕРІ РЅР° СЃРµС‚РєРµ СѓСЃРєРѕСЂРµРЅРёР№
             end
-            Title.Rows = [Title.Rows, CreateTitleNameByID(CurrentLevels, RegressionArg{i})]; %Заголовки по строкам
-        case 'УН' %Ускорения нейтральные
+            Title.Rows = [Title.Rows, CreateTitleNameByID(CurrentLevels, RegressionArg{i})]; %Р—Р°РіРѕР»РѕРІРєРё РїРѕ СЃС‚СЂРѕРєР°Рј
+        case 'РЈРќ' %РЈСЃРєРѕСЂРµРЅРёСЏ РЅРµР№С‚СЂР°Р»СЊРЅС‹Рµ
             for j = 1:size(MonotoneAccel{2},2)
-                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyMonotoneAccel{2}, FrequencyInputAccel, MonotoneAccel{2}(:,j), 1, 0)]; %Аппроксимация спектров на сетке ускорений
+                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyMonotoneAccel{2}, FrequencyInputAccel, MonotoneAccel{2}(:,j), 1, 0)]; %РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ СЃРїРµРєС‚СЂРѕРІ РЅР° СЃРµС‚РєРµ СѓСЃРєРѕСЂРµРЅРёР№
             end
-            Title.Rows = [Title.Rows, CreateTitleNameByID(CurrentLevels, RegressionArg{i})]; %Заголовки по строкам
-        case 'УУ' %Ускорения убывающие
+            Title.Rows = [Title.Rows, CreateTitleNameByID(CurrentLevels, RegressionArg{i})]; %Р—Р°РіРѕР»РѕРІРєРё РїРѕ СЃС‚СЂРѕРєР°Рј
+        case 'РЈРЈ' %РЈСЃРєРѕСЂРµРЅРёСЏ СѓР±С‹РІР°СЋС‰РёРµ
             for j = 1:size(MonotoneAccel{3},2)
-                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyMonotoneAccel{3}, FrequencyInputAccel, MonotoneAccel{3}(:,j), 1, 0)]; %Аппроксимация спектров на сетке ускорений
+                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyMonotoneAccel{3}, FrequencyInputAccel, MonotoneAccel{3}(:,j), 1, 0)]; %РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ СЃРїРµРєС‚СЂРѕРІ РЅР° СЃРµС‚РєРµ СѓСЃРєРѕСЂРµРЅРёР№
             end
-            Title.Rows = [Title.Rows, CreateTitleNameByID(CurrentLevels, RegressionArg{i})]; %Заголовки по строкам
-        case 'УЗ'
+            Title.Rows = [Title.Rows, CreateTitleNameByID(CurrentLevels, RegressionArg{i})]; %Р—Р°РіРѕР»РѕРІРєРё РїРѕ СЃС‚СЂРѕРєР°Рј
+        case 'РЈР—'
             for j = 1:2
-                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyExpAccel, FrequencyInputAccel, ExpAccel(:,j), 1, 0)]; %Аппроксимация спектров на сетке ускорений
+                ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyExpAccel, FrequencyInputAccel, ExpAccel(:,j), 1, 0)]; %РђРїРїСЂРѕРєСЃРёРјР°С†РёСЏ СЃРїРµРєС‚СЂРѕРІ РЅР° СЃРµС‚РєРµ СѓСЃРєРѕСЂРµРЅРёР№
             end
-            Title.Rows = [Title.Rows, CreateTitleNameByID([-1 0], RegressionArg{i})]; %Заголовки по строкам
+            Title.Rows = [Title.Rows, CreateTitleNameByID([-1 0], RegressionArg{i})]; %Р—Р°РіРѕР»РѕРІРєРё РїРѕ СЃС‚СЂРѕРєР°Рј
     end
 end
-catch %Недостаточное число точек
+catch %РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕРµ С‡РёСЃР»Рѕ С‚РѕС‡РµРє
     for s = 1:ParamsNumb.Full + ParamsNumb.Vec, RegressionTable{s} = 0; end
     Title.Rows = 'Empty'; Title.Cols = 'Empty';
     return
 end
-%Фильтрация пустых сигналов
+%Р¤РёР»СЊС‚СЂР°С†РёСЏ РїСѓСЃС‚С‹С… СЃРёРіРЅР°Р»РѕРІ
 for i = size(ComplexTableSignal,2):-1:1
     if ~nnz(ComplexTableSignal(:,i))
-        ComplexTableSignal(:,i) = []; %Удаление нулевого столбца
-        Title.Rows(i) = []; %Удаление заголовка
+        ComplexTableSignal(:,i) = []; %РЈРґР°Р»РµРЅРёРµ РЅСѓР»РµРІРѕРіРѕ СЃС‚РѕР»Р±С†Р°
+        Title.Rows(i) = []; %РЈРґР°Р»РµРЅРёРµ Р·Р°РіРѕР»РѕРІРєР°
     end
 end
 Title.Cols = Title.Rows; %Placeholder
-ColsNumb = size(ComplexTableSignal, 2); %Число колонок
+ColsNumb = size(ComplexTableSignal, 2); %Р§РёСЃР»Рѕ РєРѕР»РѕРЅРѕРє
 
-%Инициализация полей структуры
-    %Табличный
+%РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРѕР»РµР№ СЃС‚СЂСѓРєС‚СѓСЂС‹
+    %РўР°Р±Р»РёС‡РЅС‹Р№
 for s = 1:ParamsNumb.Full
-    RegressionTable{s} = zeros(ColsNumb); %Таблица [угловых коэффициентов, дистанций рассеяния, длин кривых]
+    RegressionTable{s} = zeros(ColsNumb); %РўР°Р±Р»РёС†Р° [СѓРіР»РѕРІС‹С… РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ, РґРёСЃС‚Р°РЅС†РёР№ СЂР°СЃСЃРµСЏРЅРёСЏ, РґР»РёРЅ РєСЂРёРІС‹С…]
 end
-    %Векторный
+    %Р’РµРєС‚РѕСЂРЅС‹Р№
 for s = ParamsNumb.Full + 1:ParamsNumb.Full + ParamsNumb.Vec
-    RegressionTable{s} = zeros(ColsNumb,1); %Таблица [амплитуда, максимальная частота]
+    RegressionTable{s} = zeros(ColsNumb,1); %РўР°Р±Р»РёС†Р° [Р°РјРїР»РёС‚СѓРґР°, РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ С‡Р°СЃС‚РѕС‚Р°]
 end
-%Вычисление регресионных параметров по сигналам
+%Р’С‹С‡РёСЃР»РµРЅРёРµ СЂРµРіСЂРµСЃРёРѕРЅРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РїРѕ СЃРёРіРЅР°Р»Р°Рј
 for i = 1:ColsNumb 
-   BaseSignal = ComplexTableSignal(:,i); %Основной сигнал
-   %Вычисление параметров регрессии
-   [MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal);  %Максимумы рассеяния
-   FreqMaxBaseSignal = FrequencyInputAccel(MaxBaseSignalInd);  %Частоты
-   %Запись результатов расчёта
-   RegressionTable{4}(i) = MaxBaseSignal; %Амплитуда сигнала
-   RegressionTable{5}(i) = FreqMaxBaseSignal; %Частота сигнала
+   BaseSignal = ComplexTableSignal(:,i); %РћСЃРЅРѕРІРЅРѕР№ СЃРёРіРЅР°Р»
+   %Р’С‹С‡РёСЃР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЂРµРіСЂРµСЃСЃРёРё
+   [MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal);  %РњР°РєСЃРёРјСѓРјС‹ СЂР°СЃСЃРµСЏРЅРёСЏ
+   FreqMaxBaseSignal = FrequencyInputAccel(MaxBaseSignalInd);  %Р§Р°СЃС‚РѕС‚С‹
+   %Р—Р°РїРёСЃСЊ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ СЂР°СЃС‡С‘С‚Р°
+   RegressionTable{4}(i) = MaxBaseSignal; %РђРјРїР»РёС‚СѓРґР° СЃРёРіРЅР°Р»Р°
+   RegressionTable{5}(i) = FreqMaxBaseSignal; %Р§Р°СЃС‚РѕС‚Р° СЃРёРіРЅР°Р»Р°
    for j = 1:ColsNumb 
-       ShowSignal = ComplexTableSignal(:,j); %Сигнал для сравнения
-       %Построение линейной регрессии
-       LinearRegressionCoeffs = polyfit(BaseSignal, ShowSignal, 1); %Коэффициенты для линейной регрессии
-       LinearRegressionFun = polyval(LinearRegressionCoeffs, BaseSignal); %Вычисление значений линейной регрессии
-       DistanceScatter = sum(abs(ShowSignal - LinearRegressionFun)); %Дистанция рассеяния
-       %[MaxShowSignal MaxShowSignalInd] = max(ShowSignal); %[MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal);  %Максимумы рассеяния
-       %FreqMaxShowSignal = Frequency(MaxShowSignalInd); %FreqMaxBaseSignal = Frequency(MaxBaseSignalInd);  %Частоты
-       LengthCurve = 0; %Инициализация длины кривой
+       ShowSignal = ComplexTableSignal(:,j); %РЎРёРіРЅР°Р» РґР»СЏ СЃСЂР°РІРЅРµРЅРёСЏ
+       %РџРѕСЃС‚СЂРѕРµРЅРёРµ Р»РёРЅРµР№РЅРѕР№ СЂРµРіСЂРµСЃСЃРёРё
+       LinearRegressionCoeffs = polyfit(BaseSignal, ShowSignal, 1); %РљРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ Р»РёРЅРµР№РЅРѕР№ СЂРµРіСЂРµСЃСЃРёРё
+       LinearRegressionFun = polyval(LinearRegressionCoeffs, BaseSignal); %Р’С‹С‡РёСЃР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ Р»РёРЅРµР№РЅРѕР№ СЂРµРіСЂРµСЃСЃРёРё
+       DistanceScatter = sum(abs(ShowSignal - LinearRegressionFun)); %Р”РёСЃС‚Р°РЅС†РёСЏ СЂР°СЃСЃРµСЏРЅРёСЏ
+       %[MaxShowSignal MaxShowSignalInd] = max(ShowSignal); %[MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal);  %РњР°РєСЃРёРјСѓРјС‹ СЂР°СЃСЃРµСЏРЅРёСЏ
+       %FreqMaxShowSignal = Frequency(MaxShowSignalInd); %FreqMaxBaseSignal = Frequency(MaxBaseSignalInd);  %Р§Р°СЃС‚РѕС‚С‹
+       LengthCurve = 0; %РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РґР»РёРЅС‹ РєСЂРёРІРѕР№
        for p = 1:length(BaseSignal) - 1
-           LengthCurve = LengthCurve + sqrt((BaseSignal(p+1) - BaseSignal(p))^2 + (ShowSignal(p+1) - ShowSignal(p))^2); %Длина кривой
+           LengthCurve = LengthCurve + sqrt((BaseSignal(p+1) - BaseSignal(p))^2 + (ShowSignal(p+1) - ShowSignal(p))^2); %Р”Р»РёРЅР° РєСЂРёРІРѕР№
        end
-       %Запись результатов расчёта
-       RegressionTable{1}(i,j) = LinearRegressionCoeffs(1); %Угловой коэффициент
-       RegressionTable{2}(i,j) = DistanceScatter; %Дистанция рассеяния
-       RegressionTable{3}(i,j) = LengthCurve; %Длина рассеяния
+       %Р—Р°РїРёСЃСЊ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ СЂР°СЃС‡С‘С‚Р°
+       RegressionTable{1}(i,j) = LinearRegressionCoeffs(1); %РЈРіР»РѕРІРѕР№ РєРѕСЌС„С„РёС†РёРµРЅС‚
+       RegressionTable{2}(i,j) = DistanceScatter; %Р”РёСЃС‚Р°РЅС†РёСЏ СЂР°СЃСЃРµСЏРЅРёСЏ
+       RegressionTable{3}(i,j) = LengthCurve; %Р”Р»РёРЅР° СЂР°СЃСЃРµСЏРЅРёСЏ
    end
 end
    
 end
 
 function Title = CreateTitleNameByID(Levels, ID)
-    % Создание заголовка простой конкатенацией номера уровня и идентификатора
+    % РЎРѕР·РґР°РЅРёРµ Р·Р°РіРѕР»РѕРІРєР° РїСЂРѕСЃС‚РѕР№ РєРѕРЅРєР°С‚РµРЅР°С†РёРµР№ РЅРѕРјРµСЂР° СѓСЂРѕРІРЅСЏ Рё РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°
     for i = 1:length(Levels)
         if Levels(i) <= 0
             Title{i} = strcat(ID, num2str(Levels(i))); %ID-N
