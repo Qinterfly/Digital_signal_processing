@@ -3,7 +3,7 @@ function OutputSaveXls(OutputSignal, TitleLevels, FileName, TechnicalData, Path,
 %одним вызовом COM сервера Excel
 
 %Запись пути сохранения
-Path = strcat(Path,'\Результаты\',InputFileName);
+Path = strcat(Path,'/Результаты/',InputFileName);
 if ~isdir(Path) %Создание директории для данного сигнала
    mkdir(Path);  
 end

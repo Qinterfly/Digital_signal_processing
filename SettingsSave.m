@@ -4,7 +4,7 @@ function SettingsSave(SettingsOutput, Path, InputFileName)
 if ~isempty(SettingsOutput) && size(SettingsOutput,2) ~= 2 %Проверка формы вывода данных
     error('Некорректная форма вывода настроек программы');
 end
-Path = strcat(Path,'\Результаты\',InputFileName);
+Path = strcat(Path,'/Результаты/',InputFileName);
 if ~isdir(Path)
    mkdir(Path); %Создание директории для данного сигнала 
 end

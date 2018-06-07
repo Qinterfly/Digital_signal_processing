@@ -3,7 +3,7 @@ function OutputSaveRegressionInform(RegressionTable, Title, FileName, TechnicalD
 %закладками
 
 %Запись пути сохранения
-Path = strcat(Path,'\Результаты\',InputFileName);
+Path = strcat(Path,'/Результаты/',InputFileName);
 if ~isdir(Path) %Создание директории для данного сигнала
    mkdir(Path);  
 end

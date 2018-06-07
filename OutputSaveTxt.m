@@ -1,7 +1,7 @@
 function OutputSaveTxt(OutputSignal, FileName, TechnicalData, Path, InputFileName)
 %Сохранение выходных файлов, датированных днём записи исходного сигнала
 
-Path = strcat(Path,'\Результаты\',InputFileName);
+Path = strcat(Path,'/Результаты/',InputFileName);
 if ~isdir(Path) %Создание директории для данного сигнала
    mkdir(Path);  
 end
