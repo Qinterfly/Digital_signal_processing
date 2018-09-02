@@ -1,0 +1,9 @@
+Export_fig/
+ProofAccel_main/
+Doc/
+Signals/
+Tensor/
+Theory/
+Archive/
+*.png
+*.txt
