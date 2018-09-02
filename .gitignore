@@ -1,20 +1,10 @@
-<<<<<<< HEAD
+Archive/
+Doc/
+
 Export_fig/
 ProofAccel_main/
-Doc/
 Signals/
 Tensor/
 Theory/
-Archive/
 *.png
-=======
-Export_fig/
-ProofAccel_main/
-Doc/
-Signals/
-Tensor/
-Theory/
-Archive/
-*.png
->>>>>>> 01979d8da44a030617cdb3b02d939a88d099d7ff
 *.txt
