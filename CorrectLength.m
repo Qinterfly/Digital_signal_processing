@@ -52,10 +52,7 @@ end
 for i = 1:LevelsNumb %Цикл по всем уровням
     CopyNumb = ceil(LengthCorrect/length(Pattern{i})); %Число копирований по длине
     if CopyNumb > 1 %Если склейка больше заданной длины
-        NewSignal{i} = [Signal{i};Pattern{i}];
-        for j = 1:CopyNumb %Копируем CopyNumb раз
-            NewSignal{i} = [NewSignal{i}; Pattern{i}];
-        end
+        NewSignal{i} = [Signal{i}; repmat(Pattern{i}, CopyNumb, 1)]; %Копируем CopyNumb раз
     else
         NewSignal{i} = Signal{i}(1:LengthCorrect,:);
         NewSignal{i}(end,3) = 1; %Новые конец
