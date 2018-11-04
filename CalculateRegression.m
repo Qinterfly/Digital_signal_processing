@@ -2,7 +2,7 @@ function [RegressionTable, Title] = CalculateRegression(InputAccel, Accel, Monot
 %Создание таблицы регрессионных коэффициентов по заданным аргументам.
 
 ComplexTableSignal = []; Title.Rows = {}; Title.Cols = {}; %Таблица сигналов и заголовков по всем уровням
-ParamsNumb.Full = 3; %Число параметров для табличного анализа
+ParamsNumb.Full = 4; %Число параметров для табличного анализа
 ParamsNumb.Vec = 2; %Число параметров для векторного анализа
 
 %Составление массива сигналов по маске
@@ -36,7 +36,7 @@ for i = 1:length(RegressionArg)
             for j = 1:2
                 ComplexTableSignal = [ComplexTableSignal, ApproxSpline(FrequencyExpAccel, FrequencyInputAccel, ExpAccel(:,j), 1, 0)]; %Аппроксимация спектров на сетке ускорений
             end
-            Title.Rows = [Title.Rows, CreateTitleNameByID([-1 0], RegressionArg{i})]; %Заголовки по строкам
+            Title.Rows = [Title.Rows, CreateTitleNameByID([-1, 0], RegressionArg{i})]; %Заголовки по строкам
     end
 end
 catch %Недостаточное число точек
@@ -44,11 +44,11 @@ catch %Недостаточное число точек
     Title.Rows = 'Empty'; Title.Cols = 'Empty';
     return
 end
-%Фильтрация пустых сигналов
+% Фильтрация пустых сигналов
 for i = size(ComplexTableSignal,2):-1:1
     if ~nnz(ComplexTableSignal(:,i))
-        ComplexTableSignal(:,i) = []; %Удаление нулевого столбца
-        Title.Rows(i) = []; %Удаление заголовка
+        ComplexTableSignal(:,i) = []; % Удаление нулевого столбца
+        Title.Rows(i) = []; % Удаление заголовка
     end
 end
 Title.Cols = Title.Rows; %Placeholder
@@ -57,11 +57,11 @@ ColsNumb = size(ComplexTableSignal, 2); %Число колонок
 %Инициализация полей структуры
     %Табличный
 for s = 1:ParamsNumb.Full
-    RegressionTable{s} = zeros(ColsNumb); %Таблица [угловых коэффициентов, дистанций рассеяния, длин кривых]
+    RegressionTable{s} = zeros(ColsNumb); %Таблица [угловых коэффициентов, дистанций рассеяния, длин кривых, коэффициенты подобия]
 end
     %Векторный
 for s = ParamsNumb.Full + 1:ParamsNumb.Full + ParamsNumb.Vec
-    RegressionTable{s} = zeros(ColsNumb,1); %Таблица [амплитуда, максимальная частота]
+    RegressionTable{s} = zeros(ColsNumb, 1); %Таблица [амплитуда, максимальная частота]
 end
 %Вычисление регресионных параметров по сигналам
 for i = 1:ColsNumb 
@@ -70,8 +70,8 @@ for i = 1:ColsNumb
    [MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal);  %Максимумы рассеяния
    FreqMaxBaseSignal = FrequencyInputAccel(MaxBaseSignalInd);  %Частоты
    %Запись результатов расчёта
-   RegressionTable{4}(i) = MaxBaseSignal; %Амплитуда сигнала
-   RegressionTable{5}(i) = FreqMaxBaseSignal; %Частота сигнала
+   RegressionTable{5}(i) = MaxBaseSignal; %Амплитуда сигнала
+   RegressionTable{6}(i) = FreqMaxBaseSignal; %Частота сигнала
    for j = 1:ColsNumb 
        ShowSignal = ComplexTableSignal(:,j); %Сигнал для сравнения
        %Построение линейной регрессии
@@ -82,15 +82,21 @@ for i = 1:ColsNumb
        %FreqMaxShowSignal = Frequency(MaxShowSignalInd); %FreqMaxBaseSignal = Frequency(MaxBaseSignalInd);  %Частоты
        LengthCurve = 0; %Инициализация длины кривой
        for p = 1:length(BaseSignal) - 1
-           LengthCurve = LengthCurve + sqrt((BaseSignal(p+1) - BaseSignal(p))^2 + (ShowSignal(p+1) - ShowSignal(p))^2); %Длина кривой
+           LengthCurve = LengthCurve + sqrt((BaseSignal(p+1) - BaseSignal(p)) ^ 2 + (ShowSignal(p+1) - ShowSignal(p)) ^ 2); %Длина кривой
        end
        %Запись результатов расчёта
-       RegressionTable{1}(i,j) = LinearRegressionCoeffs(1); %Угловой коэффициент
-       RegressionTable{2}(i,j) = DistanceScatter; %Дистанция рассеяния
-       RegressionTable{3}(i,j) = LengthCurve; %Длина рассеяния
+       RegressionTable{1}(i, j) = LinearRegressionCoeffs(1); % Угловой коэффициент
+       RegressionTable{2}(i, j) = DistanceScatter; % Дистанция рассеяния
+       RegressionTable{3}(i, j) = LengthCurve; % Длина рассеяния
    end
 end
-   
+% Вычисление коэффициентов подобия
+for i = 1:ColsNumb
+    for j = 1:ColsNumb
+        RegressionTable{4}(i, j) = RegressionTable{1}(i, j) * RegressionTable{1}(j, i);
+    end
+end
+
 end
 
 function Title = CreateTitleNameByID(Levels, ID)
