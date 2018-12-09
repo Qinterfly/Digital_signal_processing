@@ -46,7 +46,7 @@ catch %Недостаточное число точек
 end
 % Фильтрация пустых сигналов
 for i = size(ComplexTableSignal,2):-1:1
-    if ~nnz(ComplexTableSignal(:,i))
+    if ~nnz(ComplexTableSignal(:, i))
         ComplexTableSignal(:,i) = []; % Удаление нулевого столбца
         Title.Rows(i) = []; % Удаление заголовка
     end
@@ -93,7 +93,7 @@ end
 % Вычисление коэффициентов подобия
 for i = 1:ColsNumb
     for j = 1:ColsNumb
-        RegressionTable{4}(i, j) = RegressionTable{1}(i, j) * RegressionTable{1}(j, i);
+        RegressionTable{4}(i, j) = sqrt(RegressionTable{1}(i, j) * RegressionTable{1}(j, i));
     end
 end
 
@@ -103,9 +103,9 @@ function Title = CreateTitleNameByID(Levels, ID)
     % Создание заголовка простой конкатенацией номера уровня и идентификатора
     for i = 1:length(Levels)
         if Levels(i) <= 0
-            Title{i} = strcat(ID, num2str(Levels(i))); %ID-N
+            Title{i} = strcat(ID, num2str(Levels(i))); % ID-N
         else
-            Title{i} = strcat(ID, '+', num2str(Levels(i))); %ID+N
+            Title{i} = strcat(ID, '+', num2str(Levels(i))); % ID+N
         end
     end
 

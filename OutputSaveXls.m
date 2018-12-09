@@ -7,7 +7,7 @@ Path = strcat(Path, InputFileName);
 if ~isdir(Path) %Создание директории для данного сигнала
     mkdir(Path);
 end
-FullFileName = strcat(Path,'/',FileName,'.xls'); %Полное имя файла
+FullFileName = strcat(Path, '/', FileName, '.xls'); %Полное имя файла
 if exist(FullFileName) == 2 %Проверка существования файла
     delete(FullFileName); %Удаление
 end

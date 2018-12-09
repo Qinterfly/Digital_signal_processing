@@ -20,14 +20,12 @@ function Result = ProofAccel(FileNameDisplacement,... %Имя файла c перемещениями
 %% +==================== Информация о программе ==========================+
 
 %   Автор: П.А. Лакиза.
-%   Версия: 3.9
+%   Версия: 4.0
 %   Изменения:   
-%   - Дополнен режим построения линейной регрессии выбранных сигналов
-%   - Убраны режимы нахождения ковариации сигналов по уровням
-%   - Добавлена возможность построение поверхности коэффициентов подобия
-%   для выбранных сигналов
-%   - Добавлен режим автоматического выбора пределов построения графиков
-%  Дата: 04.11.2018
+%   - Изменена формула расчета коэффициента подобия
+%   - Добавлен автоматический режим создания перемещений и ускорений
+%   - Добавлена возможность сохранения выбранных сигналов
+%  Дата: 09.12.2018
 
 %% +========================= Служебный блок =============================+
 
@@ -76,9 +74,9 @@ end
 switch ReadMode %Считывание данных в зависимости от режима
     case 'Complex'
         %Считывание файла перемещений
-        [InputDataDisplacement TechnicalDataDisplacement Displacement] = ReadInput(FileNameDisplacement,StartReadNumbDisplacement);
+        [InputDataDisplacement, TechnicalDataDisplacement, Displacement] = ReadInput(FileNameDisplacement,StartReadNumbDisplacement);
         %Считывание файла ускорений
-        [InputDataAccel TechnicalDataAccel Accel] = ReadInput(FileNameAccel,StartReadNumbAccel);
+        [InputDataAccel, TechnicalDataAccel, Accel] = ReadInput(FileNameAccel,StartReadNumbAccel);
         if length(Accel) ~= length(Displacement) %Проверка совпадаения длин записей
             error('Длины записи сигнала перемещений и ускорений не совпадают');
         end
@@ -106,11 +104,11 @@ if CorrectDisplacement %Проверка режима коррекции линейного дрейфа
     Displacement = LineCorrect(Time, Displacement); %Отсечение низкочастотной части сигнала перемещений
 end
     %Аппроксимация функции перемещений
-[DisplacementApprox DisplacementApproxDerivative] = ApproxSpline(Time, Time, Displacement,Accuracy,1); %Аппроксимация B-сплайнами
+[DisplacementApprox, DisplacementApproxDerivative] = ApproxSpline(Time, Time, Displacement, Accuracy,1); %Аппроксимация B-сплайнами
     %Выделение уровней
 LineLevels = CreateLevels(DisplacementApprox, LevelsStep, OverlapFactor); 
 LevelsNumb = size(LineLevels, 1); %Число уровней сигнала
-[PartsDisplacement IndexPartsDisplacement] = AssignLevels(Time, Displacement, LineLevels); %Выделение частей перемещений по уровнями
+[PartsDisplacement, IndexPartsDisplacement] = AssignLevels(Time, Displacement, LineLevels); %Выделение частей перемещений по уровнями
     %Фрагментация временного сигнала с датчиков ускорений
 for i = 1:LevelsNumb
     PartsAccel{i} = zeros(size(PartsDisplacement{i})); %Выделение памети под фрагменты ускорений
@@ -125,10 +123,10 @@ end
 [PartsAccelApproxSpline,TableDecrementVisualize,PartsExpAccel,IndexPartsExpAccel,LimitsExpAccel] = FindExpDecrease(Accel,LimExpAccelLevel,AccuracyExp,FreqDecrement,SampleRate,ModelApprox);
 
     %Отсечение коротких фрагментов и нахождение производных для ускорений
-[FixPartsAccel,PartsAccelDerivative, IndexPartsAccel,...
+[FixPartsAccel, PartsAccelDerivative, IndexPartsAccel,...
     ~, ~] = FixNormalizeDerivative(PartsAccel, IndexPartsDisplacement, CutProcent, NormalizeMode);
     %Отсечение коротких фрагментов и нахождение производных для пермещений
-[FixPartsDisplacement PartsDisplacementDerivative IndexPartsDisplacement,...
+[FixPartsDisplacement, PartsDisplacementDerivative, IndexPartsDisplacement,...
     ~, ~] = FixNormalizeDerivative(PartsDisplacement, IndexPartsDisplacement, CutProcent, NormalizeMode);  
     %Отсечение коротких фрагментов для экспонециального затухания с ускорений
 [FixPartsExpAccel, PartsExpAccelDerivative, IndexPartsExpAccel,...
@@ -138,7 +136,7 @@ end
 [PartsMonotoneAccel, IndexMonotoneAccel] = ConstructMonotoneLevels(FixPartsAccel, FixPartsDisplacement, LineLevels);
     %Отсечение коротких фрагментов и нахождение производных для сигнала
 for s = 1:length(PartsMonotoneAccel) %Цикл по Increase, Neutral, Decrease
-   [FixPartsMonotoneAccel{s},PartsMonotoneAccelDerivative{s},IndexPartsMonotoneAccel{s}...
+   [FixPartsMonotoneAccel{s}, PartsMonotoneAccelDerivative{s}, IndexPartsMonotoneAccel{s}...
        ,~,~] = FixNormalizeDerivative(PartsMonotoneAccel{s}, IndexMonotoneAccel{s}, CutProcent, NormalizeMode); %Усечение и нормализация
 end
 
