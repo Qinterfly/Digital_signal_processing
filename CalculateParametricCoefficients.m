@@ -1,10 +1,14 @@
-function Result = CalculateParametricCoefficients(Signals, Param)
+function Result = CalculateParametricCoefficients(Signals, Param, Option)
 % Расчет коэффициентов подобия, угловых коэффициентов и дистанции рассеяния
 % для заданного набора сигналов
 % Param:
 %       == {'Angle', 
 %           'Sim',
 %           'Distance'}
+% Option:
+%       == {'Приведение к нулю',
+%           'Линейная корректировка',
+%           'Нормировка'
 
 % Коррекция типа параметров
 if ~iscell(Param)
@@ -34,6 +38,27 @@ end
 % Срез сигналов по длине наименьшего
 for i = 1:nSignals
     Signals{i} = Signals{i}(1:MinLengthSignals);
+end
+
+for i = 1:nSignals % Корректировка по параметру
+    Signals{i} = Signals{i}(1:MinLengthSignals);
+    if strcmp(Option, 'Приведение к нулю')
+        Signals{i} = Signals{i} - mean(Signals{i}); % Вычитание среднего
+    end
+    if strcmp(Option, 'Линейная корректировка')
+        Signals{i} = LineCorrect((1:length(Signals{i}))', Signals{i});
+    end
+    if strcmp(Option, 'Нормировка')
+        Signals{i} = Signals{i} - mean(Signals{i}); % Вычитание среднего
+        tMaxSignals(i) = max(Signals{i}); % Поиск максимумов для каждого сигнала
+    end
+end
+
+if strcmp(Option, 'Нормировка')
+    gMaxSignals = max(tMaxSignals); % Общий максимум
+    for i = 1:nSignals
+        Signals{i} = Signals{i} * gMaxSignals / tMaxSignals(i);
+    end
 end
 
 % Выделение памяти под массивы

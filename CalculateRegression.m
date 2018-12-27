@@ -75,9 +75,10 @@ for i = 1:ColsNumb
    for j = 1:ColsNumb 
        ShowSignal = ComplexTableSignal(:,j); %Сигнал для сравнения
        %Построение линейной регрессии
-       LinearRegressionCoeffs = polyfit(BaseSignal, ShowSignal, 1); %Коэффициенты для линейной регрессии
-       LinearRegressionFun = polyval(LinearRegressionCoeffs, BaseSignal); %Вычисление значений линейной регрессии
-       DistanceScatter = sum(abs(ShowSignal - LinearRegressionFun)); %Дистанция рассеяния
+       LinearRegressionCoeffs = polyfit(BaseSignal, ShowSignal, 1); % Коэффициенты для линейной регрессии
+       LinearRegressionFun = polyval(LinearRegressionCoeffs, BaseSignal); % Вычисление значений линейной регрессии
+       alpha = atan(LinearRegressionCoeffs(1)); % Угол наклона прямой
+       DistanceScatter = sum(abs( (ShowSignal - LinearRegressionFun) / cos(alpha) )); %Дистанция рассеяния
        %[MaxShowSignal MaxShowSignalInd] = max(ShowSignal); %[MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal);  %Максимумы рассеяния
        %FreqMaxShowSignal = Frequency(MaxShowSignalInd); %FreqMaxBaseSignal = Frequency(MaxBaseSignalInd);  %Частоты
        LengthCurve = 0; %Инициализация длины кривой
