@@ -1,4 +1,4 @@
-function [InputData,TechnicalData,Signal] = ReadInput(FileName,StartReadNumb)
+function [InputData, TechnicalData, Signal] = ReadInput(FileName,StartReadNumb)
 %Считывание файла c исходными данными
 
 fileID = fopen(FileName,'r'); %Открытие файла для считывания

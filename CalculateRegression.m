@@ -2,7 +2,7 @@ function [RegressionTable, Title] = CalculateRegression(InputAccel, Accel, Monot
 %Создание таблицы регрессионных коэффициентов по заданным аргументам.
 
 ComplexTableSignal = []; Title.Rows = {}; Title.Cols = {}; %Таблица сигналов и заголовков по всем уровням
-ParamsNumb.Full = 4; %Число параметров для табличного анализа
+ParamsNumb.Full = 5; %Число параметров для табличного анализа
 ParamsNumb.Vec = 2; %Число параметров для векторного анализа
 
 %Составление массива сигналов по маске
@@ -57,7 +57,7 @@ ColsNumb = size(ComplexTableSignal, 2); %Число колонок
 %Инициализация полей структуры
     %Табличный
 for s = 1:ParamsNumb.Full
-    RegressionTable{s} = zeros(ColsNumb); %Таблица [угловых коэффициентов, дистанций рассеяния, длин кривых, коэффициенты подобия]
+    RegressionTable{s} = zeros(ColsNumb); %Таблица [угловых коэффициентов, дистанций рассеяния, длин кривых, коэффициенты амплитуд рассеяния, коэффициенты подобия]
 end
     %Векторный
 for s = ParamsNumb.Full + 1:ParamsNumb.Full + ParamsNumb.Vec
@@ -73,28 +73,34 @@ for i = 1:ColsNumb
    RegressionTable{5}(i) = MaxBaseSignal; %Амплитуда сигнала
    RegressionTable{6}(i) = FreqMaxBaseSignal; %Частота сигнала
    for j = 1:ColsNumb 
-       ShowSignal = ComplexTableSignal(:,j); %Сигнал для сравнения
+       ShowSignal = ComplexTableSignal(:, j); %Сигнал для сравнения
        %Построение линейной регрессии
        LinearRegressionCoeffs = polyfit(BaseSignal, ShowSignal, 1); % Коэффициенты для линейной регрессии
        LinearRegressionFun = polyval(LinearRegressionCoeffs, BaseSignal); % Вычисление значений линейной регрессии
        alpha = atan(LinearRegressionCoeffs(1)); % Угол наклона прямой
-       DistanceScatter = sum(abs( (ShowSignal - LinearRegressionFun) / cos(alpha) )); %Дистанция рассеяния
-       %[MaxShowSignal MaxShowSignalInd] = max(ShowSignal); %[MaxBaseSignal MaxBaseSignalInd] = max(BaseSignal);  %Максимумы рассеяния
-       %FreqMaxShowSignal = Frequency(MaxShowSignalInd); %FreqMaxBaseSignal = Frequency(MaxBaseSignalInd);  %Частоты
+       % Расчет дистанций рассения
+       CentY = mean(LinearRegressionFun);
+       CentX = (CentY - LinearRegressionCoeffs(2)) / LinearRegressionCoeffs(1);
+       DistanceScatterAlong = sum(abs(BaseSignal - CentX)); % Продольная
+       DistanceScatterNormal = sum(abs(ShowSignal - CentY)); % Нормальная
+       DistanceScatter = sum(abs(ShowSignal - LinearRegressionFun)) * cos(alpha); % Cуммарная
+       CoeffScatter = DistanceScatterNormal / DistanceScatterAlong; % Коэффициент рассеяния
+       % Длина кривой
        LengthCurve = 0; %Инициализация длины кривой
        for p = 1:length(BaseSignal) - 1
            LengthCurve = LengthCurve + sqrt((BaseSignal(p+1) - BaseSignal(p)) ^ 2 + (ShowSignal(p+1) - ShowSignal(p)) ^ 2); %Длина кривой
        end
        %Запись результатов расчёта
        RegressionTable{1}(i, j) = LinearRegressionCoeffs(1); % Угловой коэффициент
-       RegressionTable{2}(i, j) = DistanceScatter; % Дистанция рассеяния
+       RegressionTable{2}(i, j) = DistanceScatter; % Дистанция рассеяния суммарная
        RegressionTable{3}(i, j) = LengthCurve; % Длина рассеяния
+       RegressionTable{4}(i, j) = CoeffScatter; % Коэффициент амлитуд рассеяния
    end
 end
 % Вычисление коэффициентов подобия
 for i = 1:ColsNumb
     for j = 1:ColsNumb
-        RegressionTable{4}(i, j) = sqrt(RegressionTable{1}(i, j) * RegressionTable{1}(j, i));
+        RegressionTable{5}(i, j) = sqrt(RegressionTable{1}(i, j) * RegressionTable{1}(j, i));
     end
 end
 

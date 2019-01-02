@@ -4,7 +4,8 @@ function Result = CalculateParametricCoefficients(Signals, Param, Option)
 % Param:
 %       == {'Angle', 
 %           'Sim',
-%           'Distance'}
+%           'Distance',
+%           'CoeffScatter'}
 % Option:
 %       == {'Приведение к нулю',
 %           'Линейная корректировка',
@@ -21,58 +22,39 @@ nParam = length(Param); % Число параметров
 isParam.Angle = FindEntry(Param, 'Angle'); 
 isParam.Sim = FindEntry(Param, 'Sim');
 isParam.Distance = FindEntry(Param, 'Distance');
+isParam.CoeffScatter = FindEntry(Param, 'CoeffScatter');
 
 % Обработка исключения
-if ~(isParam.Angle || isParam.Sim || isParam.Distance)
+if ~(isParam.Angle || isParam.Sim || isParam.Distance || isParam.CoeffScatter)
     error('Неверный параметр расчета');
 end
 
 nSignals = length(Signals); % Число сигналов
-MinLengthSignals = Inf; % Начальное приближение длин сигналов
-for i = 1:nSignals
-    if length(Signals{i}) < MinLengthSignals % Запись минимальной длины сигнала
-        MinLengthSignals = length(Signals{i});
-    end
-end
-
-% Срез сигналов по длине наименьшего
-for i = 1:nSignals
-    Signals{i} = Signals{i}(1:MinLengthSignals);
-end
-
-for i = 1:nSignals % Корректировка по параметру
-    Signals{i} = Signals{i}(1:MinLengthSignals);
-    if strcmp(Option, 'Приведение к нулю')
-        Signals{i} = Signals{i} - mean(Signals{i}); % Вычитание среднего
-    end
-    if strcmp(Option, 'Линейная корректировка')
-        Signals{i} = LineCorrect((1:length(Signals{i}))', Signals{i});
-    end
-    if strcmp(Option, 'Нормировка')
-        Signals{i} = Signals{i} - mean(Signals{i}); % Вычитание среднего
-        tMaxSignals(i) = max(Signals{i}); % Поиск максимумов для каждого сигнала
-    end
-end
-
-if strcmp(Option, 'Нормировка')
-    gMaxSignals = max(tMaxSignals); % Общий максимум
-    for i = 1:nSignals
-        Signals{i} = Signals{i} * gMaxSignals / tMaxSignals(i);
-    end
-end
+Signals = NormalizeSignals(Signals, Option); % Нормировка сигналов
 
 % Выделение памяти под массивы
 if isParam.Angle, DataAngleCoeff = zeros(nSignals); end % Углы
 if isParam.Sim, DataSimilarityCoeff = zeros(nSignals); end % Подобия    
 if isParam.Distance, DistanceScatter = zeros(nSignals); end % Дистанции
+if isParam.CoeffScatter, CoeffScatter = zeros(nSignals); end % Коэффициент амплитуд рассеяния
 
 % Вычислиение массивов
 for i = 1:nSignals
     for j = 1:nSignals
         LinearRegressionCoeffs = polyfit(Signals{i}, Signals{j}, 1); % Коэффициенты линейной регресии
+        if isParam.Distance || isParam.CoeffScatter
+            LinearRegressionFun = polyval(LinearRegressionCoeffs, Signals{i}); % Вычисление значений функции регрессиий
+        end
         if isParam.Distance % Для поверхности дистанций рассеяния
-            LinearRegressionFun = polyval(LinearRegressionCoeffs, Signals{i}); % Вычисление значений функции регрессии
-            DistanceScatter(i, j) = sum(abs(Signals{j} - LinearRegressionFun)); % Дистанция рассеяния
+            alpha = atan(LinearRegressionCoeffs(1)); % Угол наклона прямой
+            DistanceScatter(i, j) = sum(abs(Signals{j} - LinearRegressionFun)) * cos(alpha); % Дистанция рассеяния
+        end
+        if isParam.CoeffScatter % Для коэффициента рассеяния            
+            CentY = mean(LinearRegressionFun);
+            CentX = (CentY - LinearRegressionCoeffs(2)) / LinearRegressionCoeffs(1);
+            DistanceScatterAlong = sum(abs(Signals{i} - CentX)); % Продольная
+            DistanceScatterNormal = sum(abs(Signals{j} - CentY)); % Нормальная   
+            CoeffScatter(i, j) = DistanceScatterNormal / DistanceScatterAlong; % cos(alpha) сокращается
         end
         if isParam.Sim || isParam.Angle % 'Sim' || 'Angle'
             DataAngleCoeff(i, j) = LinearRegressionCoeffs(1); % Запись углового коэффициента
@@ -98,6 +80,8 @@ for i = 1:length(Param)
             Result{itr} = DataSimilarityCoeff;
         case 'Distance'
             Result{itr} = DistanceScatter;
+        case 'CoeffScatter'
+            Result{itr} = CoeffScatter;
     end
     itr = itr + 1; %  Приращение счетчика
 end
