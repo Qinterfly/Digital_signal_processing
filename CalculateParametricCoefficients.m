@@ -30,7 +30,6 @@ if ~(isParam.Angle || isParam.Sim || isParam.Distance || isParam.CoeffScatter)
 end
 
 nSignals = length(Signals); % Число сигналов
-Signals = NormalizeSignals(Signals, Option); % Нормировка сигналов
 
 % Выделение памяти под массивы
 if isParam.Angle, DataAngleCoeff = zeros(nSignals); end % Углы
@@ -40,6 +39,7 @@ if isParam.CoeffScatter, CoeffScatter = zeros(nSignals); end % Коэффициент ампли
 
 % Вычислиение массивов
 for i = 1:nSignals
+    Signals = NormalizeSignals(Signals, i, Option); % Нормировка сигналов к базовому
     for j = 1:nSignals
         LinearRegressionCoeffs = polyfit(Signals{i}, Signals{j}, 1); % Коэффициенты линейной регресии
         if isParam.Distance || isParam.CoeffScatter
@@ -47,14 +47,12 @@ for i = 1:nSignals
         end
         if isParam.Distance % Для поверхности дистанций рассеяния
             alpha = atan(LinearRegressionCoeffs(1)); % Угол наклона прямой
-            DistanceScatter(i, j) = sum(abs(Signals{j} - LinearRegressionFun)) * cos(alpha); % Дистанция рассеяния
+            DistanceScatter(i, j) = 1 / length(Signals{j}) *  sum(abs(Signals{j} - LinearRegressionFun)) * cos(alpha); % Дистанция рассеяния
         end
         if isParam.CoeffScatter % Для коэффициента рассеяния            
-            CentY = mean(LinearRegressionFun);
-            CentX = (CentY - LinearRegressionCoeffs(2)) / LinearRegressionCoeffs(1);
-            DistanceScatterAlong = sum(abs(Signals{i} - CentX)); % Продольная
-            DistanceScatterNormal = sum(abs(Signals{j} - CentY)); % Нормальная   
-            CoeffScatter(i, j) = DistanceScatterNormal / DistanceScatterAlong; % cos(alpha) сокращается
+            tShowSignal = sum(abs(Signals{j} - mean(Signals{j})));
+            tBaseSignal = sum(abs(Signals{i} - mean(Signals{i})));
+            CoeffScatter(i, j) = tShowSignal / sqrt(tBaseSignal ^ 2 + tShowSignal ^ 2); % Коэффициент рассеяния
         end
         if isParam.Sim || isParam.Angle % 'Sim' || 'Angle'
             DataAngleCoeff(i, j) = LinearRegressionCoeffs(1); % Запись углового коэффициента

@@ -1,4 +1,4 @@
-function Signals = NormalizeSignals(Signals, Option)
+function Signals = NormalizeSignals(Signals, numBaseSignal, Option)
 % Нормировка сигналов по параметру
 % option = 
 %       'Приведение к нулю'
@@ -6,8 +6,10 @@ function Signals = NormalizeSignals(Signals, Option)
 %       'Нормировка'
 
 if ~iscell(Signals) % Проверка структуры входных данных
-    tSignals = Signals; Signals = [];
-    Signals{1} = tSignals; % Перзапись содержимого
+    for i = 1:size(Signals, 2)
+        tSignals = Signals; Signals = {};
+        Signals{i} = tSignals(:, i); % Перзапись содержимого
+    end
 end
 
 nSignals = length(Signals); % Число выбранных сигналов
@@ -31,8 +33,8 @@ end
 
 % Нормировка к угловому коэффициенту по базовому сигналу
 if strcmp(Option, 'Нормировка') 
-    for i = 2:nSignals % Нормировка к базовому сигналу (первому выбранному)
-        LinearRegressionCoeffs = polyfit(Signals{1}, Signals{i}, 1); % Коэффициенты линейной регресии
+    for i = 1:nSignals % Нормировка к базовому сигналу (первому выбранному)
+        LinearRegressionCoeffs = polyfit(Signals{numBaseSignal}, Signals{i}, 1); % Коэффициенты линейной регресии
         Signals{i} = Signals{i} / abs(LinearRegressionCoeffs(1)); % К угловому коэффциенту
     end
 end
