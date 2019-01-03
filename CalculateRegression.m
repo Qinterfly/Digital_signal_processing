@@ -82,7 +82,7 @@ for i = 1:ColsNumb
         DistanceScatter = 1 / length(ShowSignal) * sum(abs(ShowSignal - LinearRegressionFun)) * cos(alpha); % Cуммарная
         tShowSignal = sum(abs(ShowSignal - mean(ShowSignal)));
         tBaseSignal = sum(abs(BaseSignal - mean(BaseSignal)));
-        CoeffScatter = tShowSignal / sqrt(tBaseSignal ^ 2 + tShowSignal ^ 2); % Коэффициент рассеяния
+        CoeffScatter = DistanceScatter * length(ShowSignal) / sqrt(tBaseSignal ^ 2 + tShowSignal ^ 2); % Коэффициент рассеяния
         % Длина кривой
         LengthCurve = 0; %Инициализация длины кривой
         for p = 1:length(BaseSignal) - 1

@@ -45,14 +45,14 @@ for i = 1:nSignals
         if isParam.Distance || isParam.CoeffScatter
             LinearRegressionFun = polyval(LinearRegressionCoeffs, Signals{i}); % Вычисление значений функции регрессиий
         end
-        if isParam.Distance % Для поверхности дистанций рассеяния
+        if isParam.Distance || isParam.CoeffScatter % Для поверхности дистанций рассеяния
             alpha = atan(LinearRegressionCoeffs(1)); % Угол наклона прямой
             DistanceScatter(i, j) = 1 / length(Signals{j}) *  sum(abs(Signals{j} - LinearRegressionFun)) * cos(alpha); % Дистанция рассеяния
         end
-        if isParam.CoeffScatter % Для коэффициента рассеяния            
+        if isParam.CoeffScatter % Для коэффициента рассеяния                        
             tShowSignal = sum(abs(Signals{j} - mean(Signals{j})));
             tBaseSignal = sum(abs(Signals{i} - mean(Signals{i})));
-            CoeffScatter(i, j) = tShowSignal / sqrt(tBaseSignal ^ 2 + tShowSignal ^ 2); % Коэффициент рассеяния
+            CoeffScatter(i, j) = DistanceScatter(i, j) * length(Signals{j}) / sqrt(tBaseSignal ^ 2 + tShowSignal ^ 2); % Коэффициент рассеяния
         end
         if isParam.Sim || isParam.Angle % 'Sim' || 'Angle'
             DataAngleCoeff(i, j) = LinearRegressionCoeffs(1); % Запись углового коэффициента
