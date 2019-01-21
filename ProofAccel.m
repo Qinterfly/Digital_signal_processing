@@ -22,8 +22,8 @@ function Result = ProofAccel(FileNameDisplacement,... %Имя файла c перемещениями
 %   Автор: П.А. Лакиза.
 %   Версия: 4.2
 %   Изменения:   
-%   - Добавлен коэффициент соотношения амплитуд рассения
-%  Дата: 02.01.2019
+%   - Мелкие изменения
+%  Дата: 21.01.2019
 
 %% +========================= Служебный блок =============================+
 
@@ -206,77 +206,5 @@ Result{18} = SpectrumExpAccelGluedVisualize; %Поверхность спектра экспонециально
 Result{19} = FrequencyExpAccelGlued; %Частоты для поверхности спектра экспонециального затухающего сигнала
 Result{20} = TableDecrementVisualize; %Таблица декрементов затухания по пикам
 Result{21} = PartsAccelApproxSpline; %Аппроксимирующие сплайны для каждого пика
-
-% return;
-%% Отладка
-
-% TimeInput = FrequencyExpAccelGlued;
-% TimeInterpolate = FrequencyAccelGlued;
-% Signal = SpectrumExpAccelGluedVisualize(:,1);
-% [SignalApprox,~] = ApproxSpline(TimeInput, TimeInterpolate, Signal, 1, 0); %Вычисление значений функции для заданного дискретного набора точек
-% plot(TimeInput, Signal);
-% grid on; hold on;
-% plot(TimeInterpolate, SignalApprox);
-% 
-% figure
-% grid on;
-% plot(Accel);
-% 
-% figure %Перемещения
-% hold on; %Построение графиков в одних осях
-% plot(Time, Displacement); %Построение графика сигнала
-% grid on; %Отображение масштабной сетки
-% title('Временной сигнал перемещений'); %Название графика
-% xlabel('t'); ylabel('r'); %Название осей
-% for i = 1:length(LineLevels) %Построение горизонтальных линий
-%     for j = 1:2
-%         X = [0 length(Signal)]; Y = LineLevels(i,j);
-%         if ~mod(LineLevels(i,3),2)
-%             plot(X,[Y Y],'--','Color','red'); 
-%         else
-%             plot(X,[Y Y],':','Color','black');            
-%         end
-%         
-%     end
-% end
-% %Подпись уровней
-% for i = 1:length(LineLevels)
-%     text(X(2),mean(LineLevels(i,1:2)),num2str(LineLevels(i,3)),'FontSize',12); %Номера уровней
-% end
-% 
-% figure %Фрагменты перемещений
-% plot(PartsDisplacement{ShowNumb}(:,1),PartsDisplacement{ShowNumb}(:,2),'.'); %Построение графика
-% grid on; %Отображение масштабной сетки
-% title(['Фрагментированный по уровню №' num2str(ShowNumb) ' график перемещений']); %Название графика
-% xlabel('t'); ylabel('r'); %Название осей
-% 
-% 
-% figure %Склейка ускорений
-% plot(PartsAccelGlued{ShowNumb}(:,2)); %Построение графика
-% grid on; %Отображение масштабной сетки
-% DotGluedShow = find(PartsAccelGlued{ShowNumb}(:,3) == 1);
-% DotGluedShow(end) = []; %Обнудением последнего значения (конец сигнала
-% hold on
-% plot(DotGluedShow,PartsAccelGlued{ShowNumb}(DotGluedShow,2),'*','Color','Red');
-% plot(DotGluedShow+1,PartsAccelGlued{ShowNumb}(DotGluedShow+1,2),'*','Color','black');
-% title(['Склееный по уровню №' num2str(ShowNumb) ' график ускоерний']); %Название графика
-% xlabel('t'); ylabel('r"'); %Название осей
-% 
-% figure %Построение экспонециально убывающих и нулевых фрагментов
-% hold on; grid on
-% plot(PartsExpAccel{1}(:,1),PartsExpAccel{1}(:,2),'*','Color','blue');
-% plot(PartsExpAccel{2}(:,1),PartsExpAccel{2}(:,2),'*','Color','red');
-% plot([0 length(Accel)],[LimitsExpAccel(1) LimitsExpAccel(1)],'--','Color','black','LineWidth',1.5);
-% plot([0 length(Accel)],[LimitsExpAccel(2) LimitsExpAccel(2)],'--','Color','black','LineWidth',1.5);
-% legend('Убывающие фрагменты','Нулевые фрагменты','Лимитирующая граница');
-% figure
-% plot(PartsExpAccelGlued{1}(:,2)); %Убывающие склееные
-% DotGluedShow = find(PartsExpAccelGlued{1}(:,3) == 1);
-% DotGluedShow(end) = []; %Обнудением последнего значения (конец сигнала
-% hold on
-% plot(DotGluedShow,PartsExpAccelGlued{1}(DotGluedShow,2),'*');
-% plot(DotGluedShow+1,PartsExpAccelGlued{1}(DotGluedShow+1,2),'*','Color','black');
-% figure
-% plot(PartsExpAccelGlued{2}(:,2)); %Нулевые склееные
 
 end
